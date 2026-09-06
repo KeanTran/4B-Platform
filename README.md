@@ -21,6 +21,7 @@
 ## Tech Stack
 
 ### Frontend
+
 - **Next.js 14** - App Router, Server Components, TypeScript strict
 - **Tailwind CSS** - Utility-first CSS với CSS Variables
 - **Zustand** - State management
@@ -29,10 +30,12 @@
 - **Lucide React** - Icons
 
 ### Backend
+
 - **Supabase** - Database, Auth, Realtime
 - **Groq API** - AI Chat (free tier)
 
 ### Design
+
 - **Lexend** - Brand font (headings)
 - **Inter** - Body font
 - **Font Awesome 6** - Icons
@@ -41,6 +44,7 @@
 ## Cài đặt
 
 ### Yêu cầu
+
 - Node.js 18+
 - pnpm 8+
 
@@ -64,21 +68,6 @@ cp .env.example .env.local
 
 # Run development server
 pnpm dev
-```
-
-### Environment Variables
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# AI (optional)
-GROQ_API_KEY=your_groq_api_key
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ## Cấu trúc Project
@@ -112,16 +101,16 @@ apps/
 
 ## Routes
 
-| Route | Mô tả |
-|-------|--------|
-| `/` | Landing page |
-| `/login` | Đăng nhập |
-| `/register` | Đăng ký |
-| `/dashboard` | Tổng quan |
-| `/dashboard/split` | Chia chi phí |
-| `/dashboard/duties` | Nhiệm vụ |
-| `/dashboard/ai` | AI hỗ trợ |
-| `/dashboard/settings` | Cài đặt |
+| Route                 | Mô tả        |
+| --------------------- | ------------ |
+| `/`                   | Landing page |
+| `/login`              | Đăng nhập    |
+| `/register`           | Đăng ký      |
+| `/dashboard`          | Tổng quan    |
+| `/dashboard/split`    | Chia chi phí |
+| `/dashboard/duties`   | Nhiệm vụ     |
+| `/dashboard/ai`       | AI hỗ trợ    |
+| `/dashboard/settings` | Cài đặt      |
 
 ## Development
 
