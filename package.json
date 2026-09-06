@@ -1,0 +1,21 @@
+{
+  "name": "4b-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "4B — Nền tảng quản lý phòng trọ, chia chi phí tự động. For Better Balance.",
+  "scripts": {
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "start": "cd apps/web && npm run start",
+    "lint": "cd apps/web && npm run lint",
+    "typecheck": "cd apps/web && npm run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*"
+  ]
+}

@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ====================================
+ * 4B PLATFORM — DESIGN TOKENS
+ * Same variables as index.html
+ * ==================================== */
+:root {
+  /* Brand colors */
+  --primary: #3f7f12;
+  --primary-dark: #2d5c0d;
+  --primary-light: #d4ee7d;
+  --bg-light: #fffdea;
+  --accent: #f9a23d;
+  --accent-light: #ffe8cd;
+  --warning: #fff08c;
+  --dark: #754827;
+  --dark-surface: #4a2d18;
+  --surface: #ffffff;
+  --text-main: #332113;
+  --text-muted: #826653;
+  --border: #e6dfc8;
+  --success: #3f7f12;
+  --danger: #d9381e;
+
+  /* Semantic tokens (light mode defaults) */
+  --color-text-cream: #f5e9de;
+  --color-text-cream-soft: #d4c1b2;
+  --color-text-cream-strong: #f2e1d5;
+  --color-bg-register-form: rgba(255, 255, 255, 0.08);
+  --color-bg-register-form-focus: rgba(255, 255, 255, 0.14);
+  --color-bg-switcher: rgba(0, 0, 0, 0.25);
+  --color-bg-soft-primary: #eef7d5;
+  --color-border-soft-primary: #cce870;
+  --color-border-register: #946949;
+  --color-footer-link: #c4ab98;
+  --color-footer-bottom: #9a7b64;
+  --color-footer-divider: #613e25;
+  --color-danger-text: #571308;
+  --color-bg-warning-soft: #ffd0cb;
+  --color-border-warning-soft: #f2a8a0;
+  --color-accent-warning: #0084ff;
+  --gradient-primary: linear-gradient(135deg, #3f7f12 0%, #2d5c0d 100%);
+  --gradient-dark: linear-gradient(135deg, #754827 0%, #4a2d18 100%);
+  --gradient-soft-success: linear-gradient(135deg, rgba(212, 238, 125, 0.2), rgba(212, 238, 125, 0.05));
+  --color-window-header-bg: #f7f3e1;
+  --color-table-row-alt: #f7f3e1;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* Radius & shadow */
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 10px 30px -10px rgba(63, 127, 18, 0.15);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode */
+[data-theme='dark'] {
+  --bg-light: #1a1a1a;
+  --surface: #2d2d2d;
+  --text-main: #e5e5e5;
+  --text-muted: #a8a8a8;
+  --border: #404040;
+  --dark: #d4a574;
+  --dark-surface: #111;
+
+  --color-text-cream: #f5e9de;
+  --color-text-cream-soft: #d4c1b2;
+  --color-text-cream-strong: #f2e1d5;
+  --color-bg-register-form: rgba(255, 255, 255, 0.06);
+  --color-bg-register-form-focus: rgba(255, 255, 255, 0.12);
+  --color-bg-switcher: rgba(0, 0, 0, 0.4);
+  --color-bg-soft-primary: rgba(212, 238, 125, 0.1);
+  --color-border-soft-primary: rgba(212, 238, 125, 0.3);
+  --color-border-register: #6b6b6b;
+  --color-footer-link: #c4ab98;
+  --color-footer-bottom: #8a7565;
+  --color-footer-divider: #4a3022;
+  --color-danger-text: #ffb4a8;
+  --color-bg-warning-soft: rgba(217, 56, 30, 0.15);
+  --color-border-warning-soft: rgba(217, 56, 30, 0.4);
+  --color-window-header-bg: #2d2d2d;
+  --color-table-row-alt: #353535;
+  --gradient-dark: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+/* ====================================
+ * RESET
+ * ==================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .brand-font {
+  font-family: 'Lexend', sans-serif;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Focus styles */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ====================================
+ * UTILITY CLASSES
+ * ==================================== */
+@layer utilities {
+  .text-cream { color: var(--color-text-cream); }
+  .text-cream-soft { color: var(--color-text-cream-soft); }
+  .text-cream-strong { color: var(--color-text-cream-strong); }
+  .text-danger-strong { color: var(--color-danger-text); }
+
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-dark { background: var(--gradient-dark); }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #3f7f12, #f9a23d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ====================================
+ * KEYFRAMES
+ * ==================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ====================================
+ * INTERSECTION OBSERVER (scroll animations)
+ * ==================================== */
+.fade-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
