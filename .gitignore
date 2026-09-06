@@ -41,3 +41,8 @@ coverage/
 
 # Debug
 npm-debug.log
+
+# Exclude sensitive/internal files
+.claude/
+CLAUDE.md
+index.html
