@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -28,13 +29,15 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Connect to Supabase auth
-      // const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-      //   redirectTo: `${window.location.origin}/reset-password`,
-      // });
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/settings`,
+      });
 
-      // Simulate sending email
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (authError) {
+        setError(authError.message || 'Không thể gửi email. Vui lòng thử lại.');
+        return;
+      }
 
       setIsSuccess(true);
       toast.success('Đã gửi email đặt lại mật khẩu!');

@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { createClient } from '@/lib/supabase/client';
+import { useAppStore } from '@/store/app-store';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { setUser } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -55,22 +58,47 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Connect to Supabase auth
-      // const { error } = await supabase.auth.signUp({
-      //   email: formData.email,
-      //   password: formData.password,
-      //   options: {
-      //     data: { full_name: formData.name },
-      //   },
-      // });
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name.trim(),
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-      // Simulate registration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          toast.error('Email này đã được đăng ký. Vui lòng đăng nhập.');
+        } else {
+          toast.error(error.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+        }
+        return;
+      }
 
-      toast.success('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-      router.push('/login');
-    } catch {
-      toast.error('Đăng ký thất bại. Vui lòng thử lại.');
+      if (data.session && data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email || formData.email.trim(),
+          full_name: formData.name.trim(),
+          avatar_url: null,
+          phone: null,
+          zalo_id: null,
+          created_at: data.user.created_at,
+          updated_at: data.user.created_at,
+        });
+        toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
+        router.push('/dashboard');
+        router.refresh();
+      } else {
+        toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
+        router.push('/login');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }

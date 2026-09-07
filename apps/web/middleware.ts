@@ -11,13 +11,7 @@ export async function middleware(request: NextRequest) {
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
-  // For dev mode or public routes, skip auth check
-  const publicRoutes = ['/', '/login', '/register', '/forgot-password'];
-  const isPublicRoute = publicRoutes.some((route) =>
-    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith('/#'),
-  );
-
-  if (isDevMode || isPublicRoute) {
+  if (isDevMode) {
     return supabaseResponse;
   }
 
@@ -46,10 +40,12 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname = request.nextUrl.pathname;
+
   // Protected routes
   const protectedRoutes = ['/dashboard'];
   const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route),
+    pathname.startsWith(route),
   );
 
   // Redirect to login if accessing protected route without auth
@@ -60,7 +56,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to dashboard if already logged in and accessing auth pages
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
+  const authRoutes = ['/login', '/register'];
+  if (user && authRoutes.includes(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);

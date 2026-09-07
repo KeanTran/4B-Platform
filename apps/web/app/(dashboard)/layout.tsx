@@ -8,6 +8,7 @@ import { AIChatWidget } from '@/components/shared/AIChatWidget';
 import { EditMemberModal, QRCodeModal, AddExpenseModal, AddDutyModal, NotificationDropdown } from '@/components/shared';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 const NAV_ITEMS = [
@@ -50,10 +51,29 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAppStore();
+  const { user, setUser, logout } = useAppStore();
   const { notifications, markAsRead, markAllAsRead } = useUIStore();
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Sync Supabase user session to AppStore if not loaded yet
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user: authUser } }) => {
+      if (authUser && !user) {
+        setUser({
+          id: authUser.id,
+          email: authUser.email || '',
+          full_name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || null,
+          avatar_url: authUser.user_metadata?.avatar_url || null,
+          phone: authUser.phone || null,
+          zalo_id: null,
+          created_at: authUser.created_at,
+          updated_at: authUser.updated_at || authUser.created_at,
+        });
+      }
+    });
+  }, [user, setUser]);
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -66,10 +86,17 @@ export default function DashboardLayout({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Lỗi đăng xuất Supabase:', error);
+    }
     logout();
     toast.success('Đã đăng xuất thành công!');
-    router.push('/');
+    router.push('/login');
+    router.refresh();
   };
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => {

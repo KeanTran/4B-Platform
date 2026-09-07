@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { createClient } from '@/lib/supabase/client';
+import { useAppStore } from '@/store/app-store';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setUser } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -41,28 +44,62 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Connect to Supabase auth
-      // const { error } = await supabase.auth.signInWithPassword({
-      //   email: formData.email,
-      //   password: formData.password,
-      // });
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
-      // Simulate login
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Email hoặc mật khẩu không chính xác.');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Email chưa được xác thực. Vui lòng kiểm tra email của bạn.');
+        } else {
+          toast.error(error.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+        }
+        return;
+      }
 
-      toast.success('Đăng nhập thành công!');
-      router.push('/dashboard');
-    } catch {
-      toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email || formData.email.trim(),
+          full_name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || null,
+          avatar_url: data.user.user_metadata?.avatar_url || null,
+          phone: data.user.phone || null,
+          zalo_id: null,
+          created_at: data.user.created_at,
+          updated_at: data.user.updated_at || data.user.created_at,
+        });
+
+        toast.success('Đăng nhập thành công!');
+        router.push('/dashboard');
+        router.refresh();
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = (provider: 'google' | 'facebook') => {
-    toast.info(`Đang chuyển hướng đến ${provider === 'google' ? 'Google' : 'Facebook'}...`);
-    // TODO: Connect to Supabase OAuth
-    // window.location.href = `/api/auth/${provider}`;
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    try {
+      toast.info(`Đang chuyển hướng đến ${provider === 'google' ? 'Google' : 'Facebook'}...`);
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        toast.error(`Đăng nhập qua ${provider} thất bại: ${error.message}`);
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi: ${err?.message || 'Không thể chuyển hướng đăng nhập'}`);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,7 +152,7 @@ export default function LoginPage() {
               bạn bè ở ghép.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {/* Email */}
               <div>
                 <label
