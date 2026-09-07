@@ -4,9 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
+import { useAppStore } from '@/store/app-store';
 
 export function RegisterSection() {
   const router = useRouter();
+  const { setUser } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +24,8 @@ export function RegisterSection() {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Vui lòng nhập họ tên';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Họ tên phải có ít nhất 2 ký tự';
     }
 
     if (!formData.email.trim()) {
@@ -51,14 +56,70 @@ export function RegisterSection() {
     setIsLoading(true);
 
     try {
-      // TODO: Connect to Supabase auth
-      // For now, simulate registration
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name.trim(),
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-      toast.success('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-      router.push('/login');
-    } catch {
-      toast.error('Đăng ký thất bại. Vui lòng thử lại.');
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          toast.error('Email này đã được đăng ký. Vui lòng đăng nhập.');
+          router.push('/login');
+        } else {
+          toast.error(error.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+        }
+        return;
+      }
+
+      if (data.session && data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email || formData.email.trim(),
+          full_name: formData.name.trim(),
+          avatar_url: null,
+          phone: null,
+          zalo_id: null,
+          created_at: data.user.created_at,
+          updated_at: data.user.created_at,
+        });
+        toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
+        router.push('/dashboard');
+        router.refresh();
+      } else {
+        // Fallback: try signing in immediately with password in case signUp didn't auto-create session
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email.trim(),
+          password: formData.password,
+        });
+
+        if (signInData?.session && signInData?.user) {
+          setUser({
+            id: signInData.user.id,
+            email: signInData.user.email || formData.email.trim(),
+            full_name: formData.name.trim(),
+            avatar_url: null,
+            phone: null,
+            zalo_id: null,
+            created_at: signInData.user.created_at,
+            updated_at: signInData.user.created_at,
+          });
+          toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
+          router.push('/dashboard');
+          router.refresh();
+        } else {
+          toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
+          router.push('/login');
+        }
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }

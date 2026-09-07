@@ -59,6 +59,13 @@ export const metadata: Metadata = {
     description:
       'Chia chi phí phòng trọ sòng phẳng & êm đẹp. Tự động hóa tính toán, VietQR 1-chạm, Zalo Bot nhắc nợ tự động.',
   },
+  icons: {
+    icon: [
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
   robots: {
     index: true,
     follow: true,
@@ -71,6 +78,8 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@500;600;700;800&display=swap"
           rel="stylesheet"

@@ -47,10 +47,10 @@ export function Footer() {
             <Link href="/" className="mb-4 inline-flex items-center gap-2 no-underline">
               <BrandLogo height={40} />
               <span
-                className="brand-font text-2xl font-extrabold"
+                className="brand-font text-xl md:text-2xl font-extrabold"
                 style={{ color: 'var(--color-text-cream)' }}
               >
-                4B
+                For Better Balance
               </span>
             </Link>
             <p

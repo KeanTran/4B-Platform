@@ -50,8 +50,8 @@ export function Header() {
       >
         <Link href="/" className="flex items-center gap-2.5 no-underline" style={{ color: 'var(--dark)' }}>
           <BrandLogo height={38} />
-          <span className="brand-font text-2xl font-extrabold tracking-tight" style={{ color: 'var(--dark)' }}>
-            4B
+          <span className="brand-font text-xl md:text-2xl font-extrabold tracking-tight whitespace-nowrap" style={{ color: 'var(--dark)' }}>
+            For Better Balance
           </span>
         </Link>
 
