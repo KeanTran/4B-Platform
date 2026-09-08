@@ -14,8 +14,21 @@ const MOCK_MEMBERS = [
   { id: '4', name: 'Thành viên 3', paid: false, amount: 1200000, role: 'member' as const },
 ];
 
+const BANK_CODE_MAP: Record<string, string> = {
+  Vietcombank: '970436',
+  BIDV: '970418',
+  VietinBank: '970415',
+  Agribank: '970405',
+  TPBank: '970423',
+  MBBank: '970426',
+  VPBank: '970432',
+  ACB: '970416',
+  Sacombank: '970403',
+  Techcombank: '970407',
+};
+
 export default function DashboardPage() {
-  const { members, setMembers, expenses, removeMember } = useAppStore();
+  const { members, setMembers, expenses, removeMember, bankSetting, currentRoom } = useAppStore();
   const { openModal } = useUIStore();
 
   const [memberFilter, setMemberFilter] = useState('all');
@@ -97,6 +110,48 @@ export default function DashboardPage() {
     if (window.confirm(`Bạn có chắc muốn xóa "${member.nickname}" khỏi phòng?`)) {
       removeMember(member.id);
       toast.success(`Đã xóa "${member.nickname}" khỏi phòng`);
+    }
+  };
+
+  // Dynamic bank and QR details from settings
+  const bankDisplayName = bankSetting?.bank_name || 'MBBank';
+  const bankAccountNumber = bankSetting?.account_number || '090xxx888';
+  const bankAccountHolder = bankSetting?.account_name || 'Minh Tuấn';
+  const roomNameClean = (currentRoom?.name || 'Phòng 302').replace(/[^a-zA-Z0-9]/g, '').toUpperCase() || 'PHONG302';
+  const transferContent = `4B ${roomNameClean} DONGTIEN`;
+  const bankBin = bankSetting?.bank_bin || BANK_CODE_MAP[bankDisplayName] || '970426';
+  const qrAmount = membersWithPayment[0]?.amount || 1200000;
+
+  const qrImageUrl = bankSetting
+    ? `https://img.vietqr.io/image/${bankBin}-${bankAccountNumber}-compact2.png?amount=${qrAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(bankAccountHolder)}`
+    : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=4B_${roomNameClean}_${qrAmount}`;
+
+  const handleDownloadQR = () => {
+    const link = document.createElement('a');
+    link.href = qrImageUrl;
+    link.download = `VietQR_${roomNameClean}.png`;
+    link.target = '_blank';
+    link.click();
+    toast.success('Đang tải mã QR...');
+  };
+
+  const handleShareQR = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Mã VietQR ${currentRoom?.name || 'Phòng 302'}`,
+          text: `Chuyển khoản đóng tiền phòng: ${bankDisplayName} - ${bankAccountNumber} (${bankAccountHolder})\nNội dung: ${transferContent}`,
+          url: qrImageUrl,
+        });
+        toast.success('Chia sẻ thành công!');
+      } catch {
+        // User cancelled
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(
+        `Ngân hàng: ${bankDisplayName}\nSTK: ${bankAccountNumber}\nChủ TK: ${bankAccountHolder}\nNội dung: ${transferContent}`
+      );
+      toast.success('Đã sao chép thông tin chuyển khoản vào clipboard!');
     }
   };
 
@@ -374,25 +429,28 @@ export default function DashboardPage() {
               style={{ background: 'white' }}
             >
               <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=4B_PHONG302_1200000"
+                src={qrImageUrl}
                 alt="VietQR"
-                className="h-[150px] w-[150px]"
+                className="h-[150px] w-[150px] object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=4B_${roomNameClean}_${qrAmount}`;
+                }}
               />
             </div>
 
             {/* QR Meta Info */}
             <div className="space-y-1 text-sm" style={{ color: 'var(--dark)' }}>
               <div>
-                Ngân hàng: <strong>MBBank - 090xxx888</strong>
+                Ngân hàng: <strong>{bankDisplayName} - {bankAccountNumber}</strong>
               </div>
               <div>
-                Chủ TK: <strong>Minh Tuấn</strong>
+                Chủ TK: <strong>{bankAccountHolder}</strong>
               </div>
               <div
                 className="mx-auto mt-2 inline-block rounded-lg px-3 py-1.5 text-xs"
                 style={{ background: 'var(--color-bg-soft-primary)', color: 'var(--primary-dark)' }}
               >
-                Nội dung: <strong>4B PHONG302 DONGTIEN</strong>
+                Nội dung: <strong>{transferContent}</strong>
               </div>
             </div>
 
@@ -407,6 +465,7 @@ export default function DashboardPage() {
                 QR Cá Nhân
               </button>
               <button
+                onClick={handleDownloadQR}
                 className="rounded-lg border px-4 py-2 text-xs font-semibold transition-colors hover:bg-[var(--bg-light)]"
                 style={{ borderColor: 'var(--border)', color: 'var(--text-main)' }}
               >
@@ -414,6 +473,7 @@ export default function DashboardPage() {
                 Tải QR
               </button>
               <button
+                onClick={handleShareQR}
                 className="rounded-lg border px-4 py-2 text-xs font-semibold transition-colors hover:bg-[var(--bg-light)]"
                 style={{ borderColor: 'var(--border)', color: 'var(--text-main)' }}
               >

@@ -62,7 +62,7 @@ export function QRCodeModal() {
 
   const generateQRContent = (member: QRMember) => {
     if (!bankSetting) return '';
-    const bankCode = getBankCode(bankSetting.bank_name);
+    const bankCode = bankSetting.bank_bin || getBankCode(bankSetting.bank_name);
     const amount = member.amount;
     const content = bankSetting.account_number;
     return `https://img.vietqr.io/image/${bankCode}-${content}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(`4B THANH TOAN ${member.name}`)}&accountName=${encodeURIComponent(bankSetting.account_name)}`;
@@ -78,6 +78,7 @@ export function QRCodeModal() {
     link.href = generateQRContent(selectedMember);
     link.download = `QR_${selectedMember.name}_${selectedMember.amount}.png`;
     link.target = '_blank';
+    link.click();
     toast.success('Đang tải mã QR...');
   };
 
