@@ -195,9 +195,9 @@ export function QRCodeModal() {
                   <img
                     src={generateQRContent(selectedMember)}
                     alt={`QR for ${selectedMember.name}`}
-                    className="h-[180px] w-[180px]"
+                    className="h-[250px] w-[250px] object-contain"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=4B_${selectedMember.name}_${selectedMember.amount}`;
+                      (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=4B_${selectedMember.name}_${selectedMember.amount}`;
                     }}
                   />
                   <p className="mt-3 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -205,7 +205,7 @@ export function QRCodeModal() {
                   </p>
                 </>
               ) : (
-                <div className="flex h-[180px] w-[180px] items-center justify-center">
+                <div className="flex h-[250px] w-[250px] items-center justify-center">
                   <div className="text-center">
                     <i className="fa-solid fa-triangle-exclamation text-3xl" style={{ color: 'var(--accent)' }} />
                     <p className="mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>

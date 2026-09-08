@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
 export function AddMemberModal() {
-  const { modalOpen, closeModal } = useUIStore();
+  const { modalOpen, closeModal, addNotification } = useUIStore();
   const { addMember, members } = useAppStore();
 
   const [name, setName] = useState('');
@@ -36,6 +36,11 @@ export function AddMemberModal() {
     };
 
     addMember(newMember);
+    addNotification({
+      type: 'system',
+      title: 'Thành viên mới',
+      message: `"${name.trim()}" đã được thêm vào phòng.`,
+    });
     toast.success(`Đã thêm thành viên "${name.trim()}" thành công!`);
     closeModal();
   };

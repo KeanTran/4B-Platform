@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
 export function EditMemberModal() {
-  const { modalOpen, modalData, closeModal } = useUIStore();
+  const { modalOpen, modalData, closeModal, addNotification } = useUIStore();
   const { updateMember } = useAppStore();
 
   const member = modalData?.member as { id: string; nickname?: string | null; role?: string } | undefined;
@@ -24,6 +24,11 @@ export function EditMemberModal() {
     }
 
     updateMember(member.id, { nickname: name.trim(), role: role as 'owner' | 'admin' | 'member' });
+    addNotification({
+      type: 'system',
+      title: 'Cập nhật thành viên',
+      message: `Thông tin của thành viên "${name.trim()}" đã được cập nhật.`,
+    });
     toast.success('Đã cập nhật thông tin thành viên');
     closeModal();
   };

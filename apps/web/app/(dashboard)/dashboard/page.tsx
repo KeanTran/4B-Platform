@@ -29,7 +29,7 @@ const BANK_CODE_MAP: Record<string, string> = {
 
 export default function DashboardPage() {
   const { members, setMembers, expenses, removeMember, bankSetting, currentRoom } = useAppStore();
-  const { openModal } = useUIStore();
+  const { openModal, addNotification } = useUIStore();
 
   const [memberFilter, setMemberFilter] = useState('all');
   const [memberSort, setMemberSort] = useState('default');
@@ -82,6 +82,20 @@ export default function DashboardPage() {
   const handleReset = () => {
     setMemberFilter('all');
     setMemberSort('default');
+    setMembers(MOCK_MEMBERS.map((m, i) => ({
+      id: m.id,
+      room_id: 'room-1',
+      user_id: `user-${i}`,
+      nickname: m.name,
+      role: m.role,
+      joined_at: new Date().toISOString(),
+    })));
+    addNotification({
+      type: 'system',
+      title: 'Đặt lại thành viên',
+      message: 'Danh sách thành viên đã được khôi phục về mặc định.',
+    });
+    toast.success('Đã đặt lại danh sách thành viên về mặc định!');
   };
 
   const handleEditMember = (member: typeof membersWithPayment[0]) => {
@@ -109,6 +123,11 @@ export default function DashboardPage() {
     }
     if (window.confirm(`Bạn có chắc muốn xóa "${member.nickname}" khỏi phòng?`)) {
       removeMember(member.id);
+      addNotification({
+        type: 'system',
+        title: 'Xóa thành viên',
+        message: `"${member.nickname}" đã được xóa khỏi phòng.`,
+      });
       toast.success(`Đã xóa "${member.nickname}" khỏi phòng`);
     }
   };
@@ -425,15 +444,15 @@ export default function DashboardPage() {
 
             {/* QR Code Image */}
             <div
-              className="mx-auto mb-4 inline-flex items-center justify-center rounded-xl p-4"
+              className="mx-auto mb-4 inline-flex items-center justify-center rounded-2xl p-4 shadow-sm"
               style={{ background: 'white' }}
             >
               <img
                 src={qrImageUrl}
                 alt="VietQR"
-                className="h-[150px] w-[150px] object-contain"
+                className="h-[210px] w-[210px] sm:h-[230px] sm:w-[230px] object-contain transition-transform hover:scale-105"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=4B_${roomNameClean}_${qrAmount}`;
+                  (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=230x230&data=4B_${roomNameClean}_${qrAmount}`;
                 }}
               />
             </div>

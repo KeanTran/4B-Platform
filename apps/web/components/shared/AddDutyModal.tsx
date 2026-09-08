@@ -17,7 +17,7 @@ const DAY_OPTIONS = [
 ];
 
 export function AddDutyModal() {
-  const { modalOpen, closeModal } = useUIStore();
+  const { modalOpen, closeModal, addNotification } = useUIStore();
   const { members } = useAppStore();
 
   const [title, setTitle] = useState('');
@@ -49,6 +49,14 @@ export function AddDutyModal() {
     } else {
       toast.success('Đã thêm nhiệm vụ thành công!');
     }
+
+    const assignedMember = members.find((m) => m.id === assignedTo);
+    addNotification({
+      type: 'duty',
+      title: 'Lịch trực nhật mới',
+      message: `Đã phân công "${title.trim()}" cho ${assignedMember?.nickname || 'thành viên'}.`,
+    });
+
     closeModal();
   };
 

@@ -112,6 +112,24 @@ export default function RegisterPage() {
     }
   };
 
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    try {
+      toast.info(`Đang chuyển hướng đến ${provider === 'google' ? 'Google' : 'Facebook'}...`);
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        toast.error(`Đăng nhập qua ${provider} thất bại: ${error.message}`);
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi: ${err?.message || 'Không thể chuyển hướng đăng nhập'}`);
+    }
+  };
+
   return (
     <div className="w-full max-w-[400px]">
       {/* Logo */}
@@ -294,6 +312,38 @@ export default function RegisterPage() {
             )}
           </button>
         </form>
+
+        {/* Social Login */}
+        <div className="relative my-5 flex items-center justify-center">
+          <div className="w-full border-t" style={{ borderColor: 'var(--border)' }} />
+          <span
+            className="absolute px-3 text-xs"
+            style={{ background: 'var(--surface)', color: 'var(--text-muted)' }}
+          >
+            hoặc đăng ký bằng
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('facebook')}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all hover:bg-[var(--bg-light)] active:scale-95"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-main)' }}
+          >
+            <i className="fa-brands fa-facebook text-base" style={{ color: '#1877f2' }} />
+            Facebook
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('google')}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all hover:bg-[var(--bg-light)] active:scale-95"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-main)' }}
+          >
+            <i className="fa-brands fa-google text-base" style={{ color: '#ea4335' }} />
+            Google
+          </button>
+        </div>
 
         <div
           className="mt-6 border-t pt-6 text-center text-sm"

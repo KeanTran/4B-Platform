@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { formatVND } from '@/lib/split';
 
 export function AddExpenseModal() {
-  const { modalOpen, closeModal } = useUIStore();
+  const { modalOpen, closeModal, addNotification } = useUIStore();
   const { members, addExpense } = useAppStore();
 
   const [title, setTitle] = useState('');
@@ -82,6 +82,11 @@ export function AddExpenseModal() {
     };
 
     addExpense(newExpense);
+    addNotification({
+      type: 'expense',
+      title: 'Hóa đơn mới',
+      message: `Hóa đơn "${title.trim()}" (${formatVND(totalAmount)}) đã được tạo.`,
+    });
     toast.success('Đã thêm hóa đơn thành công!');
     closeModal();
   };
