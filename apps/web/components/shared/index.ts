@@ -3,6 +3,7 @@ export { EditMemberModal } from './EditMemberModal';
 export { QRCodeModal } from './QRCodeModal';
 export { AddExpenseModal } from './AddExpenseModal';
 export { AddDutyModal } from './AddDutyModal';
+export { AddMemberModal } from './AddMemberModal';
 export { NotificationDropdown } from './NotificationDropdown';
 export { AIChatWidget } from './AIChatWidget';
 export { BrandLogo } from './BrandLogo';

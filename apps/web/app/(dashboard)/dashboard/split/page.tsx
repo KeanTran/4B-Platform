@@ -18,6 +18,11 @@ export default function SplitPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [splitAmounts, setSplitAmounts] = useState<number[]>([]);
 
+  // Ratio state: map member index -> percentage
+  const [memberRatios, setMemberRatios] = useState<Record<string, number>>({});
+  // Days state: map member index -> days stayed
+  const [memberDays, setMemberDays] = useState<Record<string, number>>({});
+
   // Initialize mock members if empty
   useEffect(() => {
     if (members.length === 0) {
@@ -33,10 +38,56 @@ export default function SplitPage() {
     }
   }, [members.length]);
 
+  // Initialize ratios and days when members change
+  useEffect(() => {
+    if (members.length > 0) {
+      const defaultRatios: Record<string, number> = {};
+      const defaultDays: Record<string, number> = {};
+      const equalRatio = Math.floor(100 / members.length);
+      members.forEach((m, i) => {
+        if (!memberRatios[m.id]) {
+          // Last member gets the remainder to make sure it sums to 100
+          defaultRatios[m.id] = i === members.length - 1
+            ? 100 - equalRatio * (members.length - 1)
+            : equalRatio;
+        } else {
+          defaultRatios[m.id] = memberRatios[m.id] ?? equalRatio;
+        }
+        if (!memberDays[m.id]) {
+          defaultDays[m.id] = 30;
+        } else {
+          defaultDays[m.id] = memberDays[m.id] ?? 30;
+        }
+      });
+      setMemberRatios(defaultRatios);
+      setMemberDays(defaultDays);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members.length]);
+
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '');
     setExpenseValue(value);
   };
+
+  const handleRatioChange = (memberId: string, value: string) => {
+    const num = parseInt(value, 10);
+    setMemberRatios(prev => ({
+      ...prev,
+      [memberId]: isNaN(num) ? 0 : Math.min(100, Math.max(0, num)),
+    }));
+  };
+
+  const handleDaysChange = (memberId: string, value: string) => {
+    const num = parseInt(value, 10);
+    setMemberDays(prev => ({
+      ...prev,
+      [memberId]: isNaN(num) ? 0 : Math.max(0, num),
+    }));
+  };
+
+  const totalRatio = Object.values(memberRatios).reduce((sum, r) => sum + r, 0);
+  const totalDays = Object.values(memberDays).reduce((sum, d) => sum + d, 0);
 
   const handleApplyExpense = () => {
     if (!expenseTitle || !expenseValue) {
@@ -45,11 +96,45 @@ export default function SplitPage() {
     }
 
     const total = parseInt(expenseValue, 10) || 0;
-    const perPerson = Math.floor(total / members.length);
     const amounts: number[] = [];
 
-    for (let i = 0; i < members.length; i++) {
-      amounts.push(perPerson + (i < (total % members.length) ? 1 : 0));
+    if (splitMode === 'equal') {
+      const perPerson = Math.floor(total / members.length);
+      for (let i = 0; i < members.length; i++) {
+        amounts.push(perPerson + (i < (total % members.length) ? 1 : 0));
+      }
+    } else if (splitMode === 'ratio') {
+      if (totalRatio !== 100) {
+        toast.error(`Tổng tỷ lệ phải bằng 100% (hiện tại: ${totalRatio}%)`);
+        return;
+      }
+      let allocated = 0;
+      members.forEach((m, i) => {
+        const ratio = memberRatios[m.id] || 0;
+        if (i === members.length - 1) {
+          amounts.push(total - allocated);
+        } else {
+          const amount = Math.floor(total * ratio / 100);
+          amounts.push(amount);
+          allocated += amount;
+        }
+      });
+    } else if (splitMode === 'days') {
+      if (totalDays === 0) {
+        toast.error('Tổng số ngày phải lớn hơn 0');
+        return;
+      }
+      let allocated = 0;
+      members.forEach((m, i) => {
+        const days = memberDays[m.id] || 0;
+        if (i === members.length - 1) {
+          amounts.push(total - allocated);
+        } else {
+          const amount = Math.floor(total * days / totalDays);
+          amounts.push(amount);
+          allocated += amount;
+        }
+      });
     }
 
     setSplitAmounts(amounts);
@@ -239,6 +324,144 @@ export default function SplitPage() {
                 />
               </div>
             </div>
+
+            {/* ========== RATIO INPUT SECTION ========== */}
+            {splitMode === 'ratio' && members.length > 0 && (
+              <div
+                className="mb-4 rounded-xl border p-4"
+                style={{
+                  background: 'var(--bg-light)',
+                  borderColor: 'var(--border)',
+                }}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                    Nhập tỷ lệ % cho từng thành viên
+                  </span>
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-bold"
+                    style={{
+                      background: totalRatio === 100 ? 'var(--color-bg-soft-primary)' : 'var(--color-bg-warning-soft)',
+                      color: totalRatio === 100 ? 'var(--primary)' : 'var(--danger)',
+                    }}
+                  >
+                    Tổng: {totalRatio}%
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      <div
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ background: 'var(--primary)' }}
+                      >
+                        {(member.nickname || 'T').charAt(0)}
+                      </div>
+                      <span className="flex-1 text-sm font-medium" style={{ color: 'var(--dark)' }}>
+                        {member.nickname}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={memberRatios[member.id] || 0}
+                          onChange={(e) => handleRatioChange(member.id, e.target.value)}
+                          className="w-16 rounded-lg border px-2 py-1.5 text-center text-sm font-semibold transition-colors focus:border-[var(--primary)] focus:outline-none"
+                          style={{
+                            borderColor: 'var(--border)',
+                            background: 'var(--surface)',
+                            color: 'var(--primary)',
+                          }}
+                        />
+                        <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>%</span>
+                      </div>
+                      {expenseValue && (
+                        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+                          ≈ {formatVND(Math.floor((parseInt(expenseValue, 10) || 0) * (memberRatios[member.id] || 0) / 100))}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {totalRatio !== 100 && (
+                  <div
+                    className="mt-2 flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-medium"
+                    style={{ background: 'var(--color-bg-warning-soft)', color: 'var(--danger)' }}
+                  >
+                    <i className="fa-solid fa-triangle-exclamation" />
+                    Tổng tỷ lệ phải bằng 100%. Hiện tại: {totalRatio}% ({totalRatio > 100 ? 'vượt' : 'thiếu'} {Math.abs(100 - totalRatio)}%)
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ========== DAYS INPUT SECTION ========== */}
+            {splitMode === 'days' && members.length > 0 && (
+              <div
+                className="mb-4 rounded-xl border p-4"
+                style={{
+                  background: 'var(--bg-light)',
+                  borderColor: 'var(--border)',
+                }}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                    Nhập số ngày ở cho từng thành viên
+                  </span>
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-bold"
+                    style={{ background: 'var(--color-bg-soft-primary)', color: 'var(--primary)' }}
+                  >
+                    Tổng: {totalDays} ngày
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      <div
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ background: 'var(--primary)' }}
+                      >
+                        {(member.nickname || 'T').charAt(0)}
+                      </div>
+                      <span className="flex-1 text-sm font-medium" style={{ color: 'var(--dark)' }}>
+                        {member.nickname}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="31"
+                          value={memberDays[member.id] || 0}
+                          onChange={(e) => handleDaysChange(member.id, e.target.value)}
+                          className="w-16 rounded-lg border px-2 py-1.5 text-center text-sm font-semibold transition-colors focus:border-[var(--primary)] focus:outline-none"
+                          style={{
+                            borderColor: 'var(--border)',
+                            background: 'var(--surface)',
+                            color: 'var(--primary)',
+                          }}
+                        />
+                        <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>ngày</span>
+                      </div>
+                      {expenseValue && totalDays > 0 && (
+                        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+                          ≈ {formatVND(Math.floor((parseInt(expenseValue, 10) || 0) * (memberDays[member.id] || 0) / totalDays))}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Info Box */}
             <div

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { BrandLogo } from '@/components/shared/BrandLogo';
 import { AIChatWidget } from '@/components/shared/AIChatWidget';
-import { EditMemberModal, QRCodeModal, AddExpenseModal, AddDutyModal, NotificationDropdown } from '@/components/shared';
+import { EditMemberModal, QRCodeModal, AddExpenseModal, AddDutyModal, AddMemberModal, NotificationDropdown } from '@/components/shared';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import { createClient } from '@/lib/supabase/client';
@@ -51,7 +51,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
-  const { user, setUser, logout } = useAppStore();
+  const { user, setUser, logout, currentRoom } = useAppStore();
   const { notifications, markAsRead, markAllAsRead } = useUIStore();
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -149,10 +149,10 @@ export default function DashboardLayout({
               Phòng đang quản lý
             </div>
             <div className="brand-font text-sm font-bold" style={{ color: 'var(--dark)' }}>
-              Phòng 302
+              {currentRoom?.name || 'Chưa có phòng'}
             </div>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-              minhtuan@gmail.com
+              {user?.email || 'Chưa đăng nhập'}
             </div>
           </div>
         )}
@@ -325,6 +325,7 @@ export default function DashboardLayout({
       <QRCodeModal />
       <AddExpenseModal />
       <AddDutyModal />
+      <AddMemberModal />
     </div>
   );
 }

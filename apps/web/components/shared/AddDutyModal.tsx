@@ -6,20 +6,30 @@ import { useUIStore } from '@/store/ui-store';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
+const DAY_OPTIONS = [
+  { value: 0, label: 'Thứ 2', short: 'T2' },
+  { value: 1, label: 'Thứ 3', short: 'T3' },
+  { value: 2, label: 'Thứ 4', short: 'T4' },
+  { value: 3, label: 'Thứ 5', short: 'T5' },
+  { value: 4, label: 'Thứ 6', short: 'T6' },
+  { value: 5, label: 'Thứ 7', short: 'T7' },
+  { value: 6, label: 'Chủ nhật', short: 'CN' },
+];
+
 export function AddDutyModal() {
   const { modalOpen, closeModal } = useUIStore();
   const { members } = useAppStore();
 
   const [title, setTitle] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const [selectedDay, setSelectedDay] = useState<number>(0);
   const [rotationType, setRotationType] = useState<string>('none');
 
   useEffect(() => {
     if (modalOpen === 'add-duty') {
       setTitle('');
       setAssignedTo('');
-      setDueDate('');
+      setSelectedDay(0);
       setRotationType('none');
     }
   }, [modalOpen]);
@@ -32,7 +42,13 @@ export function AddDutyModal() {
       return;
     }
 
-    toast.success('Đã thêm nhiệm vụ thành công!');
+    // Call the callback from duties page to add the duty to local state
+    const callback = (window as any).__addDutyCallback;
+    if (callback) {
+      callback(title.trim(), assignedTo, selectedDay);
+    } else {
+      toast.success('Đã thêm nhiệm vụ thành công!');
+    }
     closeModal();
   };
 
@@ -88,25 +104,32 @@ export function AddDutyModal() {
           </select>
         </div>
 
-        {/* Due Date */}
+        {/* Day of Week */}
         <div>
           <label
-            className="mb-1 block text-xs font-semibold"
+            className="mb-2 block text-xs font-semibold"
             style={{ color: 'var(--dark)' }}
           >
-            Ngày hết hạn (không bắt buộc)
+            Ngày trong tuần
           </label>
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="w-full rounded-xl border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
-            style={{
-              background: 'var(--bg-light)',
-              borderColor: 'var(--border)',
-              color: 'var(--text-main)',
-            }}
-          />
+          <div className="grid grid-cols-7 gap-1.5">
+            {DAY_OPTIONS.map((day) => (
+              <button
+                key={day.value}
+                onClick={() => setSelectedDay(day.value)}
+                className={`flex flex-col items-center rounded-xl border p-2 text-xs transition-all ${
+                  selectedDay === day.value ? 'border-[var(--primary)]' : ''
+                }`}
+                style={{
+                  borderColor: selectedDay === day.value ? 'var(--primary)' : 'var(--border)',
+                  background: selectedDay === day.value ? 'var(--color-bg-soft-primary)' : 'var(--bg-light)',
+                  color: selectedDay === day.value ? 'var(--primary)' : 'var(--text-muted)',
+                }}
+              >
+                <span className="font-bold">{day.short}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Rotation Type */}

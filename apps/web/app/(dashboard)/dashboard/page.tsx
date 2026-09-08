@@ -15,7 +15,7 @@ const MOCK_MEMBERS = [
 ];
 
 export default function DashboardPage() {
-  const { members, setMembers, expenses } = useAppStore();
+  const { members, setMembers, expenses, removeMember } = useAppStore();
   const { openModal } = useUIStore();
 
   const [memberFilter, setMemberFilter] = useState('all');
@@ -83,6 +83,21 @@ export default function DashboardPage() {
         amount: m.amount,
       })),
     });
+  };
+
+  const handleAddMember = () => {
+    openModal('add-member');
+  };
+
+  const handleRemoveMember = (member: typeof membersWithPayment[0]) => {
+    if (member.role === 'owner') {
+      toast.error('Không thể xóa trưởng phòng!');
+      return;
+    }
+    if (window.confirm(`Bạn có chắc muốn xóa "${member.nickname}" khỏi phòng?`)) {
+      removeMember(member.id);
+      toast.success(`Đã xóa "${member.nickname}" khỏi phòng`);
+    }
   };
 
   return (
@@ -181,6 +196,14 @@ export default function DashboardPage() {
                   Danh Sách Thành Viên Phòng
                 </span>
               </div>
+              <button
+                onClick={handleAddMember}
+                className="rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-all hover:-translate-y-0.5"
+                style={{ background: 'var(--gradient-primary)' }}
+              >
+                <i className="fa-solid fa-user-plus mr-1" />
+                Thêm thành viên
+              </button>
             </div>
 
             {/* Filter & Sort Bar */}
@@ -308,6 +331,16 @@ export default function DashboardPage() {
                           >
                             <i className="fa-solid fa-qrcode" />
                           </button>
+                          {member.role !== 'owner' && (
+                            <button
+                              onClick={() => handleRemoveMember(member)}
+                              className="rounded-lg p-1.5 text-xs transition-colors hover:bg-[var(--color-bg-warning-soft)]"
+                              style={{ color: 'var(--danger)' }}
+                              title="Xóa thành viên"
+                            >
+                              <i className="fa-solid fa-trash" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
