@@ -3,6 +3,8 @@ import { Footer } from '@/components/marketing/Footer';
 import { DemoModal } from '@/components/marketing';
 import { BackToTop } from '@/components/shared/BackToTop';
 
+import { LiveChat } from '@/components/marketing/LiveChat';
+
 export default function MarketingLayout({
   children,
 }: {
@@ -15,6 +17,7 @@ export default function MarketingLayout({
       <Footer />
       <DemoModal />
       <BackToTop />
+      <LiveChat />
     </div>
   );
 }

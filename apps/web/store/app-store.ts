@@ -25,6 +25,12 @@ interface AppState {
   addExpense: (expense: Expense) => void;
   updateExpense: (id: string, updates: Partial<Expense>) => void;
   deleteExpense: (id: string) => void;
+  clearAllExpenses: () => void;
+
+  // Member Payments Tracking
+  memberPayments: Record<string, boolean>;
+  toggleMemberPayment: (memberId: string) => void;
+  setMemberPayment: (memberId: string, paid: boolean) => void;
 
   // Bank Settings
   bankSetting: BankSetting | null;
@@ -55,6 +61,7 @@ const initialState = {
   currentRoom: null,
   members: [],
   expenses: [],
+  memberPayments: {},
   bankSetting: null,
   notificationSettings: {
     expenseReminder: true,
@@ -114,6 +121,28 @@ export const useAppStore = create<AppState>()(
           expenses: state.expenses.filter((e) => e.id !== id),
         })),
 
+      clearAllExpenses: () =>
+        set({
+          expenses: [],
+          memberPayments: {},
+        }),
+
+      toggleMemberPayment: (memberId) =>
+        set((state) => ({
+          memberPayments: {
+            ...state.memberPayments,
+            [memberId]: !state.memberPayments[memberId],
+          },
+        })),
+
+      setMemberPayment: (memberId, paid) =>
+        set((state) => ({
+          memberPayments: {
+            ...state.memberPayments,
+            [memberId]: paid,
+          },
+        })),
+
       setBankSetting: (bankSetting) => set({ bankSetting }),
 
       setNotificationSettings: (notificationSettings) => set({ notificationSettings }),
@@ -131,6 +160,7 @@ export const useAppStore = create<AppState>()(
         currentRoom: state.currentRoom,
         members: state.members,
         expenses: state.expenses,
+        memberPayments: state.memberPayments,
         bankSetting: state.bankSetting,
         notificationSettings: state.notificationSettings,
         monthlyBudget: state.monthlyBudget,

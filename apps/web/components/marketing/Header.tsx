@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { href: '#features', label: 'Tính Năng', icon: 'star' },
   { href: '#about', label: 'Về Chúng Tôi', icon: 'building' },
   { href: '#pricing', label: 'Gói Dịch Vụ', icon: 'tag' },
-  { href: '#testimonials', label: 'Đánh Giá', icon: 'quote-left' },
+  { href: '#blog', label: 'Blog', icon: 'newspaper' },
   { href: '#faq', label: 'FAQ', icon: 'circle-question' },
   { href: '#register', label: 'Đăng Ký', icon: 'user-plus' },
 ] as const;

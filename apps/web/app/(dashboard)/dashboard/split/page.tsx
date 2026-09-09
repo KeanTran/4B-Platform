@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 type SplitMode = 'equal' | 'ratio' | 'days';
 
 export default function SplitPage() {
-  const { members, expenses, addExpense } = useAppStore();
+  const { members, expenses, addExpense, deleteExpense, clearAllExpenses, user } = useAppStore();
   const { openModal } = useUIStore();
 
   const [splitMode, setSplitMode] = useState<SplitMode>('equal');
@@ -23,20 +23,22 @@ export default function SplitPage() {
   // Days state: map member index -> days stayed
   const [memberDays, setMemberDays] = useState<Record<string, number>>({});
 
-  // Initialize mock members if empty
+  const ownerDisplayName = user?.full_name?.trim() || (user?.email ? user.email.split('@')[0] : 'Trưởng phòng');
+
+  // Initialize members if empty
   useEffect(() => {
     if (members.length === 0) {
-      const mockMembers = [
-        { id: '1', room_id: 'room-1', user_id: 'user-1', nickname: 'Minh Tuấn (Trưởng phòng)', role: 'owner' as const, joined_at: new Date().toISOString() },
+      const initialMembers = [
+        { id: '1', room_id: 'room-1', user_id: user?.id || 'user-1', nickname: `${ownerDisplayName} (Trưởng phòng)`, role: 'owner' as const, joined_at: new Date().toISOString() },
         { id: '2', room_id: 'room-1', user_id: 'user-2', nickname: 'Thành viên 1', role: 'member' as const, joined_at: new Date().toISOString() },
         { id: '3', room_id: 'room-1', user_id: 'user-3', nickname: 'Thành viên 2', role: 'member' as const, joined_at: new Date().toISOString() },
         { id: '4', room_id: 'room-1', user_id: 'user-4', nickname: 'Thành viên 3', role: 'member' as const, joined_at: new Date().toISOString() },
       ];
-      mockMembers.forEach(m => {
+      initialMembers.forEach(m => {
         useAppStore.getState().addMember(m as any);
       });
     }
-  }, [members.length]);
+  }, [members.length, ownerDisplayName, user?.id]);
 
   // Initialize ratios and days when members change
   useEffect(() => {
@@ -178,6 +180,28 @@ export default function SplitPage() {
     setExpenseValue('');
     setSplitAmounts([]);
     toast.success('Đã lưu hóa đơn thành công!');
+  };
+
+  const handleDeleteExpense = (id: string, title: string) => {
+    if (window.confirm(`Bạn có chắc muốn xóa khoản chi "${title}"?`)) {
+      deleteExpense(id);
+      toast.success(`Đã xóa khoản chi "${title}" thành công!`);
+    }
+  };
+
+  const handleClearAllExpenses = () => {
+    if (expenses.length === 0) return;
+    if (window.confirm('Bạn có chắc muốn xóa TOÀN BỘ lịch sử các khoản chi phí không? Hệ thống sẽ đặt lại toàn bộ tổng quan thu chi.')) {
+      clearAllExpenses();
+      toast.success('Đã xóa toàn bộ lịch sử chi phí!');
+    }
+  };
+
+  const handleResetForm = () => {
+    setExpenseTitle('');
+    setExpenseValue('');
+    setShowPreview(false);
+    toast.info('Đã xóa dữ liệu nhập biểu mẫu.');
   };
 
   const getModeDescription = () => {
@@ -477,18 +501,33 @@ export default function SplitPage() {
               </p>
             </div>
 
-            {/* Apply Button */}
-            <button
-              onClick={handleApplyExpense}
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
-              style={{
-                background: 'var(--gradient-primary)',
-                boxShadow: '0 4px 12px rgba(63, 127, 18, 0.3)',
-              }}
-            >
-              <i className="fa-solid fa-check" />
-              Xác Nhận Phân Bổ Hóa Đơn
-            </button>
+            {/* Apply & Reset Form Buttons */}
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleApplyExpense}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                style={{
+                  background: 'var(--gradient-primary)',
+                  boxShadow: '0 4px 12px rgba(63, 127, 18, 0.3)',
+                }}
+              >
+                <i className="fa-solid fa-check" />
+                Xác Nhận Phân Bổ Hóa Đơn
+              </button>
+
+              {(expenseTitle || expenseValue) && (
+                <button
+                  type="button"
+                  onClick={handleResetForm}
+                  className="inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors hover:bg-[var(--bg-light)]"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                  title="Xóa thông tin vừa nhập"
+                >
+                  <i className="fa-solid fa-rotate-left" />
+                  Xóa nội dung nhập
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -571,30 +610,43 @@ export default function SplitPage() {
             }}
           >
             <div
-              className="flex items-center gap-2 border-b px-4 py-3"
+              className="flex items-center justify-between border-b px-4 py-3"
               style={{ borderColor: 'var(--border)' }}
             >
-              <i className="fa-solid fa-clock-rotate-left text-sm" style={{ color: 'var(--primary)' }} />
-              <span className="font-semibold" style={{ color: 'var(--dark)' }}>
-                Lịch Sử Các Khoản Chi Phí
-              </span>
-              <span
-                className="ml-2 rounded-full px-2 py-0.5 text-xs font-bold"
-                style={{ background: 'var(--color-bg-soft-primary)', color: 'var(--primary)' }}
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-clock-rotate-left text-sm" style={{ color: 'var(--primary)' }} />
+                <span className="font-semibold" style={{ color: 'var(--dark)' }}>
+                  Lịch Sử Các Khoản Chi Phí
+                </span>
+                <span
+                  className="ml-1 rounded-full px-2 py-0.5 text-xs font-bold"
+                  style={{ background: 'var(--color-bg-soft-primary)', color: 'var(--primary)' }}
+                >
+                  {expenses.length}
+                </span>
+              </div>
+
+              {/* Clear All Expenses */}
+              <button
+                type="button"
+                onClick={handleClearAllExpenses}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/40 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                title="Xóa tất cả các khoản chi"
               >
-                {expenses.length}
-              </span>
+                <i className="fa-solid fa-trash text-[10px]" />
+                Xóa tất cả
+              </button>
             </div>
 
             <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-              {expenses.slice(0, 5).map((expense) => (
+              {expenses.map((expense) => (
                 <div
                   key={expense.id}
-                  className="flex items-center justify-between px-4 py-3"
+                  className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-[var(--bg-light)]"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="flex h-10 w-10 items-center justify-center rounded-xl"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                       style={{ background: 'var(--color-bg-soft-primary)' }}
                     >
                       <i className="fa-solid fa-file-invoice-dollar" style={{ color: 'var(--primary)' }} />
@@ -608,47 +660,47 @@ export default function SplitPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold" style={{ color: 'var(--primary)' }}>
-                      {formatVND(expense.amount)}
+
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="font-bold" style={{ color: 'var(--primary)' }}>
+                        {formatVND(expense.amount)}
+                      </div>
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+                        style={{
+                          background: expense.status === 'paid' ? 'var(--color-bg-soft-primary)' : 'var(--color-bg-warning-soft)',
+                          color: expense.status === 'paid' ? 'var(--primary)' : 'var(--danger)',
+                        }}
+                      >
+                        {expense.status === 'paid' ? (
+                          <>
+                            <i className="fa-solid fa-check text-[8px]" />
+                            Đã thanh toán
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-clock text-[8px]" />
+                            Chưa thanh toán
+                          </>
+                        )}
+                      </span>
                     </div>
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
-                      style={{
-                        background: expense.status === 'paid' ? 'var(--color-bg-soft-primary)' : 'var(--color-bg-warning-soft)',
-                        color: expense.status === 'paid' ? 'var(--primary)' : 'var(--danger)',
-                      }}
+
+                    {/* Delete button */}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteExpense(expense.id, expense.title)}
+                      className="rounded-lg p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      title="Xóa khoản chi này"
+                      aria-label="Xóa khoản chi"
                     >
-                      {expense.status === 'paid' ? (
-                        <>
-                          <i className="fa-solid fa-check text-[8px]" />
-                          Đã thanh toán
-                        </>
-                      ) : (
-                        <>
-                          <i className="fa-solid fa-clock text-[8px]" />
-                          Chưa thanh toán
-                        </>
-                      )}
-                    </span>
+                      <i className="fa-solid fa-trash text-sm" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-
-            {expenses.length > 5 && (
-              <div
-                className="border-t px-4 py-3 text-center"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <button
-                  className="text-sm font-medium transition-colors hover:text-[var(--primary)]"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  Xem tất cả ({expenses.length} khoản)
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
