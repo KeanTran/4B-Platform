@@ -201,58 +201,6 @@ export function About() {
         </ul>
       </div>
 
-      {/* Contact Card */}
-      <div
-        className="rounded-2xl border p-6 md:p-8"
-        style={{
-          background: 'var(--color-bg-soft-primary)',
-          borderColor: 'var(--color-border-soft-primary)',
-        }}
-      >
-        <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-          <div className="text-center md:text-left">
-            <h3
-              className="mb-1 text-xl font-bold"
-              style={{ color: 'var(--dark)' }}
-            >
-              Liên hệ với 4B
-            </h3>
-            <p
-              className="text-sm"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              Đội ngũ 4B luôn sẵn sàng hỗ trợ bạn
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            <a
-              href="mailto:4bforbetterbalance@gmail.com"
-              className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/50"
-              style={{
-                borderColor: 'var(--color-border-soft-primary)',
-                color: 'var(--primary-dark)',
-                textDecoration: 'none',
-              }}
-            >
-              <i className="fa-solid fa-envelope" />
-              4bforbetterbalance@gmail.com
-            </a>
-            <a
-              href="https://www.facebook.com/share/1JFn1i3hji/?mibextid=wwXIfr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
-              style={{
-                background: '#1877f2',
-                textDecoration: 'none',
-              }}
-            >
-              <i className="fa-brands fa-facebook" />
-              Facebook
-            </a>
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

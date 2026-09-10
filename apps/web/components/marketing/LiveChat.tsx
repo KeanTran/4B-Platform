@@ -48,30 +48,24 @@ export function LiveChat() {
   };
 
   return (
-    <aside aria-label="Hỗ trợ trực tuyến" className="fixed bottom-6 right-6 z-50">
-      {/* Closed State Bubble Button */}
+    <aside aria-label="Hỗ trợ trực tuyến" className="fixed bottom-0 right-4 sm:right-8 z-50 max-w-[calc(100vw-32px)]">
+      {/* Closed State Bar Button matching reference design */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2.5 rounded-full px-4 py-3 text-white shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+          className="group flex w-48 sm:w-52 items-center justify-between rounded-t-xl px-5 py-2.5 text-white shadow-xl transition-all duration-200 hover:brightness-105 active:scale-[0.99]"
           style={{ background: 'var(--primary)' }}
           aria-label="Mở khung chat hỗ trợ"
         >
-          <div className="relative">
-            <MessageCircle className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-          </div>
-          <span className="text-sm font-bold tracking-wide">LIVE CHAT</span>
+          <span className="text-base font-bold tracking-wide">Chat Now</span>
+          <span className="text-xl font-bold leading-none select-none transition-transform duration-200 group-hover:scale-110">+</span>
         </button>
       )}
 
       {/* Open State Chat Window */}
       {isOpen && (
         <div
-          className="w-[320px] sm:w-[350px] overflow-hidden rounded-2xl border shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-5"
+          className="w-[320px] sm:w-[350px] max-w-full overflow-hidden rounded-t-2xl border border-b-0 shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-5"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',

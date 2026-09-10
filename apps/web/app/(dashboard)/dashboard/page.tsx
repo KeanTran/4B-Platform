@@ -531,7 +531,7 @@ export default function DashboardPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <div
-                            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
+                            className="flex h-8 w-8 shrink-0 aspect-square min-w-[32px] min-h-[32px] items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
                             style={{ background: member.paid ? 'var(--primary)' : 'var(--accent)' }}
                           >
                             {(member.nickname || 'T').charAt(0)}

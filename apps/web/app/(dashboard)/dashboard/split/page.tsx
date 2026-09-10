@@ -560,7 +560,7 @@ export default function SplitPage() {
                 >
                   <div className="flex items-center gap-2">
                     <div
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                      className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-full text-xs font-bold text-white"
                       style={{ background: 'var(--primary)' }}
                     >
                       {(member.nickname || 'T').charAt(0)}
