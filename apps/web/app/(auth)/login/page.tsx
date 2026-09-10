@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/app-store';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useAppStore();
+  const { setUser, setCurrentRoom } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -72,6 +72,33 @@ export default function LoginPage() {
           created_at: data.user.created_at,
           updated_at: data.user.updated_at || data.user.created_at,
         });
+
+        // Restore room from localStorage or user_metadata
+        let room = null;
+        try {
+          const userRoomStr = localStorage.getItem(`4b_room_${data.user.id}`);
+          const lastRoomStr = localStorage.getItem('4b_last_room');
+          if (userRoomStr) {
+            room = JSON.parse(userRoomStr);
+          } else if (lastRoomStr) {
+            room = JSON.parse(lastRoomStr);
+          } else if (data.user.user_metadata?.room) {
+            room = data.user.user_metadata.room;
+          }
+        } catch (e) {}
+
+        if (!room) {
+          room = {
+            id: `room-${data.user.id.slice(0, 8)}`,
+            name: data.user.user_metadata?.room_name || 'Phòng 302',
+            address: '123 Đường ABC, Quận 1, TP.HCM',
+            owner_id: data.user.id,
+            invite_code: '4B302',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+        }
+        setCurrentRoom(room);
 
         toast.success('Đăng nhập thành công!');
         router.push('/dashboard');

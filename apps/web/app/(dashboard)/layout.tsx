@@ -51,29 +51,78 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
-  const { user, setUser, logout, currentRoom } = useAppStore();
+  const { user, setUser, logout, currentRoom, setCurrentRoom } = useAppStore();
   const { notifications, markAsRead, markAllAsRead } = useUIStore();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Sync Supabase user session to AppStore if not loaded yet
+  // Sync Supabase user session to AppStore and restore room if not loaded yet
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user: authUser } }) => {
-      if (authUser && !user) {
-        setUser({
-          id: authUser.id,
-          email: authUser.email || '',
-          full_name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || null,
-          avatar_url: authUser.user_metadata?.avatar_url || null,
-          phone: authUser.phone || null,
-          zalo_id: null,
-          created_at: authUser.created_at,
-          updated_at: authUser.updated_at || authUser.created_at,
-        });
+      if (authUser) {
+        if (!user) {
+          setUser({
+            id: authUser.id,
+            email: authUser.email || '',
+            full_name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || null,
+            avatar_url: authUser.user_metadata?.avatar_url || null,
+            phone: authUser.phone || null,
+            zalo_id: null,
+            created_at: authUser.created_at,
+            updated_at: authUser.updated_at || authUser.created_at,
+          });
+        }
+
+        // Restore room if not set
+        if (!currentRoom) {
+          let restoredRoom = null;
+          try {
+            const userRoomStr = localStorage.getItem(`4b_room_${authUser.id}`);
+            const lastRoomStr = localStorage.getItem('4b_last_room');
+            if (userRoomStr) {
+              restoredRoom = JSON.parse(userRoomStr);
+            } else if (lastRoomStr) {
+              restoredRoom = JSON.parse(lastRoomStr);
+            } else if (authUser.user_metadata?.room) {
+              restoredRoom = authUser.user_metadata.room;
+            }
+          } catch (e) {}
+
+          if (!restoredRoom) {
+            restoredRoom = {
+              id: `room-${authUser.id.slice(0, 8)}`,
+              name: authUser.user_metadata?.room_name || 'Phòng 302',
+              address: '123 Đường ABC, Quận 1, TP.HCM',
+              owner_id: authUser.id,
+              invite_code: '4B302',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+          }
+          setCurrentRoom(restoredRoom);
+        }
+      } else if (!user && !currentRoom) {
+        // Fallback for guest mode without Supabase session
+        try {
+          const lastRoomStr = localStorage.getItem('4b_last_room');
+          if (lastRoomStr) {
+            setCurrentRoom(JSON.parse(lastRoomStr));
+          } else {
+            setCurrentRoom({
+              id: 'room-1',
+              name: 'Phòng 302',
+              address: '123 Đường ABC, Quận 1, TP.HCM',
+              owner_id: 'user-1',
+              invite_code: '4B302',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
+        } catch (e) {}
       }
     });
-  }, [user, setUser]);
+  }, [user, setUser, currentRoom, setCurrentRoom]);
 
   // Close profile dropdown when clicking outside
   useEffect(() => {

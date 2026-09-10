@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
+import type { RoomMember } from '@/types';
 
 const DAY_LABELS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 const DAY_FULL_LABELS = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
@@ -11,21 +12,46 @@ const DAY_FULL_LABELS = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 
 interface DutyItem {
   id: string;
   dayOfWeek: number; // 0=T2, 1=T3, ..., 6=CN
+  memberId?: string;
   member: string;
   task: string;
   status: 'done' | 'pending';
 }
 
-const INITIAL_DUTIES: DutyItem[] = [
-  { id: '1', dayOfWeek: 0, member: 'Minh Tuấn', task: 'Quét nhà', status: 'done' },
-  { id: '2', dayOfWeek: 0, member: 'Thành viên 1', task: 'Lau sàn', status: 'done' },
-  { id: '3', dayOfWeek: 1, member: 'Thành viên 2', task: 'Rửa bát', status: 'done' },
-  { id: '4', dayOfWeek: 2, member: 'Thành viên 3', task: 'Nấu cơm', status: 'pending' },
-  { id: '5', dayOfWeek: 3, member: 'Minh Tuấn', task: 'Giặt quần áo', status: 'pending' },
-  { id: '6', dayOfWeek: 4, member: 'Thành viên 1', task: 'Mua đồ ăn', status: 'pending' },
-  { id: '7', dayOfWeek: 5, member: 'Thành viên 2', task: 'Dọn nhà vệ sinh', status: 'pending' },
-  { id: '8', dayOfWeek: 6, member: 'Thành viên 3', task: 'Nấu cơm', status: 'pending' },
-];
+function generateDefaultDuties(membersList: RoomMember[]): DutyItem[] {
+  const defaultTasks = [
+    { dayOfWeek: 0, task: 'Quét nhà', status: 'done' as const },
+    { dayOfWeek: 0, task: 'Lau sàn', status: 'done' as const },
+    { dayOfWeek: 1, task: 'Rửa bát', status: 'done' as const },
+    { dayOfWeek: 2, task: 'Nấu cơm', status: 'pending' as const },
+    { dayOfWeek: 3, task: 'Giặt quần áo', status: 'pending' as const },
+    { dayOfWeek: 4, task: 'Mua đồ ăn', status: 'pending' as const },
+    { dayOfWeek: 5, task: 'Dọn nhà vệ sinh', status: 'pending' as const },
+    { dayOfWeek: 6, task: 'Nấu cơm', status: 'pending' as const },
+  ];
+
+  if (membersList.length === 0) {
+    return defaultTasks.map((t, idx) => ({
+      id: `duty-${idx + 1}`,
+      dayOfWeek: t.dayOfWeek,
+      member: 'Thành viên',
+      task: t.task,
+      status: t.status,
+    }));
+  }
+
+  return defaultTasks.map((t, idx) => {
+    const mem = membersList[idx % membersList.length];
+    return {
+      id: `duty-${idx + 1}`,
+      dayOfWeek: t.dayOfWeek,
+      memberId: mem?.id || '1',
+      member: mem?.nickname || 'Thành viên',
+      task: t.task,
+      status: t.status,
+    };
+  });
+}
 
 function getMonday(date: Date): Date {
   const d = new Date(date);
@@ -41,49 +67,180 @@ function formatDate(date: Date): string {
 }
 
 export default function DutiesPage() {
-  const { members } = useAppStore();
-  const { openModal, modalOpen, modalData, closeModal } = useUIStore();
+  const { members, user, setMembers } = useAppStore();
+  const { openModal } = useUIStore();
 
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getMonday(new Date()));
-  const [duties, setDuties] = useState<DutyItem[]>(INITIAL_DUTIES);
 
-  // Initialize mock members if empty
+  // Compute owner name based on logged-in user to match Tổng quan
+  const ownerDisplayName = useMemo(() => {
+    if (user?.full_name?.trim()) return user.full_name.trim();
+    if (user?.email) return user.email.split('@')[0];
+    return 'Trưởng phòng';
+  }, [user]);
+
+  // Initialize members if empty to match Tổng quan
   useEffect(() => {
     if (members.length === 0) {
-      const mockMembers = [
-        { id: '1', room_id: 'room-1', user_id: 'user-1', nickname: 'Minh Tuấn', role: 'owner' as const, joined_at: new Date().toISOString() },
-        { id: '2', room_id: 'room-1', user_id: 'user-2', nickname: 'Thành viên 1', role: 'member' as const, joined_at: new Date().toISOString() },
-        { id: '3', room_id: 'room-1', user_id: 'user-3', nickname: 'Thành viên 2', role: 'member' as const, joined_at: new Date().toISOString() },
-        { id: '4', room_id: 'room-1', user_id: 'user-4', nickname: 'Thành viên 3', role: 'member' as const, joined_at: new Date().toISOString() },
-      ];
-      mockMembers.forEach(m => {
-        useAppStore.getState().addMember(m as any);
-      });
+      setMembers([
+        {
+          id: '1',
+          room_id: 'room-1',
+          user_id: user?.id || 'user-0',
+          nickname: `${ownerDisplayName} (Trưởng phòng)`,
+          role: 'owner',
+          joined_at: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          room_id: 'room-1',
+          user_id: 'user-1',
+          nickname: 'Thành viên 1',
+          role: 'member',
+          joined_at: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          room_id: 'room-1',
+          user_id: 'user-2',
+          nickname: 'Thành viên 2',
+          role: 'member',
+          joined_at: new Date().toISOString(),
+        },
+        {
+          id: '4',
+          room_id: 'room-1',
+          user_id: 'user-3',
+          nickname: 'Thành viên 3',
+          role: 'member',
+          joined_at: new Date().toISOString(),
+        },
+      ]);
     }
-  }, [members.length]);
+  }, [members.length, setMembers, ownerDisplayName, user?.id]);
+
+  const [duties, setDuties] = useState<DutyItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('4b_duties');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  // Dynamic helper to resolve the up-to-date member name for any duty
+  const getDutyMemberName = useCallback(
+    (duty: DutyItem): string => {
+      if (duty.memberId) {
+        const m = members.find((mem) => mem.id === duty.memberId);
+        if (m?.nickname) return m.nickname;
+      }
+      // If legacy duty had "Minh Tuấn", map to current room owner
+      if (duty.member === 'Minh Tuấn' || duty.member?.includes('Trưởng phòng')) {
+        const owner = members.find((m) => m.role === 'owner') || members[0];
+        if (owner?.nickname) return owner.nickname;
+      }
+      // If duty has member name that matches a current member
+      const matched = members.find((m) => m.nickname === duty.member);
+      if (matched?.nickname) return matched.nickname;
+
+      return duty.member || members[0]?.nickname || 'Thành viên';
+    },
+    [members]
+  );
+
+  // Sync duties whenever members list from Tổng quan changes or initialize duties
+  useEffect(() => {
+    if (members.length === 0) return;
+
+    setDuties((prevDuties) => {
+      if (prevDuties.length === 0) {
+        const initial = generateDefaultDuties(members);
+        try {
+          localStorage.setItem('4b_duties', JSON.stringify(initial));
+        } catch (e) {}
+        return initial;
+      }
+
+      // Check if duties need update (e.g. legacy "Minh Tuấn" or name change)
+      const needsSync = prevDuties.some((d) => {
+        if (d.member === 'Minh Tuấn') return true;
+        if (d.memberId) {
+          const found = members.find((m) => m.id === d.memberId);
+          return found && found.nickname !== d.member;
+        }
+        return false;
+      });
+
+      if (!needsSync) return prevDuties;
+
+      const updated = prevDuties.map((d, index) => {
+        let targetMember = d.memberId ? members.find((m) => m.id === d.memberId) : null;
+        if (!targetMember) {
+          if (d.member === 'Minh Tuấn' || d.member?.includes('Trưởng phòng')) {
+            targetMember = members.find((m) => m.role === 'owner') || members[0];
+          } else {
+            targetMember = members.find((m) => m.nickname === d.member) || members[index % members.length];
+          }
+        }
+
+        return {
+          ...d,
+          memberId: targetMember?.id || d.memberId,
+          member: targetMember?.nickname || d.member || 'Thành viên',
+        };
+      });
+
+      try {
+        localStorage.setItem('4b_duties', JSON.stringify(updated));
+      } catch (e) {}
+
+      return updated;
+    });
+  }, [members]);
 
   const getDutiesForDay = (dayOfWeek: number) => {
     return duties.filter((d) => d.dayOfWeek === dayOfWeek);
   };
 
   const handleRotateDuty = () => {
-    const memberNames = members.map((m) => m.nickname || 'Thành viên');
-    if (memberNames.length === 0) {
+    if (members.length === 0) {
       toast.error('Cần có thành viên trong phòng để xoay vòng');
       return;
     }
 
     const rotatedDuties: DutyItem[] = duties.map((duty) => {
-      const currentIndex = memberNames.indexOf(duty.member);
-      const nextIndex = (currentIndex + 1) % memberNames.length;
-      const nextMember = memberNames[nextIndex] || 'Thành viên';
+      let currentIndex = -1;
+      if (duty.memberId) {
+        currentIndex = members.findIndex((m) => m.id === duty.memberId);
+      }
+      if (currentIndex === -1 && duty.member) {
+        currentIndex = members.findIndex((m) => m.nickname === duty.member);
+      }
+      if (currentIndex === -1 && (duty.member === 'Minh Tuấn' || duty.member?.includes('Trưởng phòng'))) {
+        currentIndex = 0;
+      }
+      if (currentIndex === -1) {
+        currentIndex = 0;
+      }
+
+      const nextIndex = (currentIndex + 1) % members.length;
+      const nextMember = members[nextIndex] || members[0];
+
       return {
         ...duty,
-        member: nextMember,
+        memberId: nextMember?.id || duty.memberId,
+        member: nextMember?.nickname || 'Thành viên',
       };
     });
 
     setDuties(rotatedDuties);
+    try {
+      localStorage.setItem('4b_duties', JSON.stringify(rotatedDuties));
+    } catch (e) {}
     toast.success('Đã xoay vòng lịch trực nhật!');
   };
 
@@ -92,17 +249,23 @@ export default function DutiesPage() {
   };
 
   // Listen for add-duty modal submission
-  // We use a custom callback approach: when modal closes with data, we add the duty
   const handleAddDutySubmit = useCallback((task: string, memberId: string, dayOfWeek: number) => {
     const member = members.find(m => m.id === memberId);
     const newDuty: DutyItem = {
       id: Math.random().toString(36).substring(7),
       dayOfWeek,
+      memberId,
       member: member?.nickname || 'Thành viên',
       task,
       status: 'pending',
     };
-    setDuties(prev => [...prev, newDuty]);
+    setDuties(prev => {
+      const updated = [...prev, newDuty];
+      try {
+        localStorage.setItem('4b_duties', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
     toast.success('Đã thêm nhiệm vụ thành công!');
   }, [members]);
 
@@ -115,18 +278,28 @@ export default function DutiesPage() {
   }, [handleAddDutySubmit]);
 
   const handleToggleDutyStatus = (dutyId: string) => {
-    setDuties((prev) =>
-      prev.map((d) =>
+    setDuties((prev) => {
+      const updated = prev.map((d) =>
         d.id === dutyId
-          ? { ...d, status: d.status === 'done' ? 'pending' : 'done' }
+          ? { ...d, status: d.status === 'done' ? ('pending' as const) : ('done' as const) }
           : d
-      )
-    );
+      );
+      try {
+        localStorage.setItem('4b_duties', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
     toast.success('Đã cập nhật trạng thái!');
   };
 
   const handleDeleteDuty = (dutyId: string) => {
-    setDuties((prev) => prev.filter((d) => d.id !== dutyId));
+    setDuties((prev) => {
+      const updated = prev.filter((d) => d.id !== dutyId);
+      try {
+        localStorage.setItem('4b_duties', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
     toast.success('Đã xóa nhiệm vụ!');
   };
 
@@ -366,7 +539,7 @@ export default function DutiesPage() {
                             </span>
                           </div>
                           <div className="truncate text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                            {duty.member}
+                            {getDutyMemberName(duty)}
                           </div>
                         </button>
                         {/* Delete button (visible on hover) */}

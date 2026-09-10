@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/app-store';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setUser } = useAppStore();
+  const { setUser, setCurrentRoom } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -90,12 +90,58 @@ export default function RegisterPage() {
           created_at: data.user.created_at,
           updated_at: data.user.created_at,
         });
+
+        const initialRoom = {
+          id: `room-${data.user.id.slice(0, 8)}`,
+          name: 'Phòng 302',
+          address: '123 Đường ABC, Quận 1, TP.HCM',
+          owner_id: data.user.id,
+          invite_code: '4B302',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setCurrentRoom(initialRoom);
+
         toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
         router.push('/dashboard');
         router.refresh();
       } else {
-        toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
-        router.push('/login');
+        // Fallback: try signing in immediately with password in case signUp didn't auto-create session
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email.trim(),
+          password: formData.password,
+        });
+
+        if (signInData?.session && signInData?.user) {
+          setUser({
+            id: signInData.user.id,
+            email: signInData.user.email || formData.email.trim(),
+            full_name: formData.name.trim(),
+            avatar_url: null,
+            phone: null,
+            zalo_id: null,
+            created_at: signInData.user.created_at,
+            updated_at: signInData.user.created_at,
+          });
+
+          const initialRoom = {
+            id: `room-${signInData.user.id.slice(0, 8)}`,
+            name: 'Phòng 302',
+            address: '123 Đường ABC, Quận 1, TP.HCM',
+            owner_id: signInData.user.id,
+            invite_code: '4B302',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          setCurrentRoom(initialRoom);
+
+          toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
+          router.push('/dashboard');
+          router.refresh();
+        } else {
+          toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
+          router.push('/login');
+        }
       }
     } catch (err: any) {
       toast.error(err?.message || 'Đăng ký thất bại. Vui lòng thử lại.');

@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
-import type { User } from '@/types';
+import type { User, Room } from '@/types';
 import { toast } from 'sonner';
 import { Modal } from '@/components/shared/Modal';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ProfilePage() {
   const { user, setUser, members, currentRoom, setCurrentRoom } = useAppStore();
@@ -89,26 +90,42 @@ export default function ProfilePage() {
   };
 
   const handleSaveRoom = () => {
-    if (!currentRoom) {
-      // Create a new room object if none exists
-      setCurrentRoom({
-        id: 'room-1',
-        name: roomForm.name,
-        address: roomForm.address,
-        owner_id: user?.id || 'user-1',
-        invite_code: '4B302',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+    const updatedRoom: Room = !currentRoom
+      ? {
+          id: `room-${(user?.id || '1').slice(0, 8)}`,
+          name: roomForm.name,
+          address: roomForm.address,
+          owner_id: user?.id || 'user-1',
+          invite_code: '4B302',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      : {
+          ...currentRoom,
+          name: roomForm.name,
+          address: roomForm.address,
+          updated_at: new Date().toISOString(),
+        };
+
+    setCurrentRoom(updatedRoom);
+
+    // Save to localStorage and Supabase metadata
+    try {
+      if (user?.id) {
+        localStorage.setItem(`4b_room_${user.id}`, JSON.stringify(updatedRoom));
+      }
+      localStorage.setItem('4b_last_room', JSON.stringify(updatedRoom));
+      const supabase = createClient();
+      supabase.auth.updateUser({
+        data: {
+          room: updatedRoom,
+          room_name: updatedRoom.name,
+        },
       });
-    } else {
-      // Update existing room
-      setCurrentRoom({
-        ...currentRoom,
-        name: roomForm.name,
-        address: roomForm.address,
-        updated_at: new Date().toISOString(),
-      });
+    } catch (e) {
+      console.error(e);
     }
+
     closeModal();
     toast.success('Cập nhật thông tin phòng thành công!');
   };

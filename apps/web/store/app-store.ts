@@ -81,7 +81,16 @@ export const useAppStore = create<AppState>()(
 
       logout: () => set({ user: null, currentRoom: null }),
 
-      setCurrentRoom: (currentRoom) => set({ currentRoom }),
+      setCurrentRoom: (currentRoom) => {
+        set({ currentRoom });
+        if (typeof window !== 'undefined' && currentRoom) {
+          try {
+            const uid = currentRoom.owner_id || 'default';
+            localStorage.setItem(`4b_room_${uid}`, JSON.stringify(currentRoom));
+            localStorage.setItem('4b_last_room', JSON.stringify(currentRoom));
+          } catch (e) {}
+        }
+      },
 
       setMembers: (members) => set({ members }),
 
