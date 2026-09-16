@@ -1,18 +1,43 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+export const PROTECTED_DASHBOARD_ROUTES = [
+  '/dashboard/profile',
+  '/dashboard/settings',
+] as const;
+
+export function isProtectedDashboardRoute(pathname: string) {
+  return PROTECTED_DASHBOARD_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
+function redirectToLogin(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  url.pathname = '/login';
+  url.searchParams.set('next', request.nextUrl.pathname);
+  return NextResponse.redirect(url);
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: request.headers,
+    },
   });
 
-  // Skip Supabase for placeholder URLs (local dev)
+  const pathname = request.nextUrl.pathname;
+  const isProtectedRoute = isProtectedDashboardRoute(pathname);
+
+  // Public Dashboard tools remain available without Supabase configuration.
+  // Sensitive routes fail closed, including local environments.
   const isDevMode =
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
   if (isDevMode) {
-    return supabaseResponse;
+    return isProtectedRoute ? redirectToLogin(request) : supabaseResponse;
   }
 
   const supabase = createServerClient(
@@ -26,7 +51,9 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({
-            request,
+            request: {
+              headers: request.headers,
+            },
           });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -40,19 +67,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
-
-  // Protected routes
-  const protectedRoutes = ['/dashboard'];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
-
-  // Redirect to login if accessing protected route without auth
   if (isProtectedRoute && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+    return redirectToLogin(request);
   }
 
   // Redirect to dashboard if already logged in and accessing auth pages

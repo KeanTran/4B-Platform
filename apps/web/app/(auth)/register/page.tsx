@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/app-store';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setUser, setCurrentRoom } = useAppStore();
+  const { activateWorkspace } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -80,7 +80,7 @@ export default function RegisterPage() {
       }
 
       if (data.session && data.user) {
-        setUser({
+        activateWorkspace({
           id: data.user.id,
           email: data.user.email || formData.email.trim(),
           full_name: formData.name.trim(),
@@ -90,17 +90,6 @@ export default function RegisterPage() {
           created_at: data.user.created_at,
           updated_at: data.user.created_at,
         });
-
-        const initialRoom = {
-          id: `room-${data.user.id.slice(0, 8)}`,
-          name: 'Phòng 302',
-          address: '123 Đường ABC, Quận 1, TP.HCM',
-          owner_id: data.user.id,
-          invite_code: '4B302',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setCurrentRoom(initialRoom);
 
         toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
         router.push('/dashboard');
@@ -113,7 +102,7 @@ export default function RegisterPage() {
         });
 
         if (signInData?.session && signInData?.user) {
-          setUser({
+          activateWorkspace({
             id: signInData.user.id,
             email: signInData.user.email || formData.email.trim(),
             full_name: formData.name.trim(),
@@ -123,17 +112,6 @@ export default function RegisterPage() {
             created_at: signInData.user.created_at,
             updated_at: signInData.user.created_at,
           });
-
-          const initialRoom = {
-            id: `room-${signInData.user.id.slice(0, 8)}`,
-            name: 'Phòng 302',
-            address: '123 Đường ABC, Quận 1, TP.HCM',
-            owner_id: signInData.user.id,
-            invite_code: '4B302',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-          setCurrentRoom(initialRoom);
 
           toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
           router.push('/dashboard');

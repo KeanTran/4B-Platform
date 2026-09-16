@@ -109,12 +109,9 @@ export default function ProfilePage() {
 
     setCurrentRoom(updatedRoom);
 
-    // Save to localStorage and Supabase metadata
+    // The scoped workspace store persists locally; metadata keeps the display
+    // name available for the current authenticated account.
     try {
-      if (user?.id) {
-        localStorage.setItem(`4b_room_${user.id}`, JSON.stringify(updatedRoom));
-      }
-      localStorage.setItem('4b_last_room', JSON.stringify(updatedRoom));
       const supabase = createClient();
       supabase.auth.updateUser({
         data: {

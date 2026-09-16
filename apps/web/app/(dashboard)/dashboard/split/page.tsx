@@ -233,7 +233,7 @@ export default function SplitPage() {
         >
           {/* Header */}
           <div
-            className="flex items-center justify-between border-b px-4 py-3"
+            className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3"
             style={{ borderColor: 'var(--border)' }}
           >
             <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export default function SplitPage() {
           <div className="p-4">
             {/* Split Mode Buttons */}
             <div
-              className="mb-4 flex gap-2 rounded-xl p-1"
+              className="mb-4 grid grid-cols-1 gap-2 rounded-xl p-1 sm:grid-cols-3"
               style={{
                 background: 'var(--bg-light)',
                 border: '1px solid var(--border)',
@@ -303,10 +303,7 @@ export default function SplitPage() {
             </div>
 
             {/* Form Grid */}
-            <div
-              className="mb-4 grid gap-3 md:grid-cols-2"
-              style={{ gridTemplateColumns: '2fr 1fr' }}
-            >
+            <div className="mb-4 grid gap-3 md:grid-cols-[2fr_1fr]">
               <div>
                 <label
                   className="mb-1 block text-xs font-semibold"

@@ -9,7 +9,7 @@ import { useAppStore } from '@/store/app-store';
 
 export function RegisterSection() {
   const router = useRouter();
-  const { setUser } = useAppStore();
+  const { activateWorkspace } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -79,7 +79,7 @@ export function RegisterSection() {
       }
 
       if (data.session && data.user) {
-        setUser({
+        activateWorkspace({
           id: data.user.id,
           email: data.user.email || formData.email.trim(),
           full_name: formData.name.trim(),
@@ -100,7 +100,7 @@ export function RegisterSection() {
         });
 
         if (signInData?.session && signInData?.user) {
-          setUser({
+          activateWorkspace({
             id: signInData.user.id,
             email: signInData.user.email || formData.email.trim(),
             full_name: formData.name.trim(),

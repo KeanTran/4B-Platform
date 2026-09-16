@@ -97,7 +97,7 @@ export function AIChatWidget() {
         <button
           onClick={handleOpen}
           aria-label="Mở AI Hỗ Trợ"
-          className="group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+          className="group fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl md:bottom-6 md:right-6 md:z-50"
           style={{
             background: 'var(--gradient-primary)',
             boxShadow: '0 6px 20px rgba(63, 127, 18, 0.4)',
@@ -116,7 +116,7 @@ export function AIChatWidget() {
       {/* Chat panel */}
       {isOpen && (
         <div
-          className="fixed bottom-6 right-6 z-50 flex h-[600px] max-h-[calc(100vh-3rem)] w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border shadow-2xl"
+          className="fixed bottom-3 right-3 z-50 flex h-[min(600px,calc(100vh-1.5rem))] w-[calc(100vw-1.5rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border shadow-2xl md:bottom-6 md:right-6 md:h-[600px] md:max-h-[calc(100vh-3rem)] md:w-[380px]"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',

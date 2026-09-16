@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
-import { useAppStore } from '@/store/app-store';
+import {
+  readScopedWorkspaceItem,
+  useAppStore,
+  writeScopedWorkspaceItem,
+} from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import type { RoomMember } from '@/types';
 
@@ -122,7 +126,7 @@ export default function DutiesPage() {
   const [duties, setDuties] = useState<DutyItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('4b_duties');
+        const saved = readScopedWorkspaceItem('duties', '4b_duties');
         if (saved) {
           return JSON.parse(saved);
         }
@@ -160,7 +164,7 @@ export default function DutiesPage() {
       if (prevDuties.length === 0) {
         const initial = generateDefaultDuties(members);
         try {
-          localStorage.setItem('4b_duties', JSON.stringify(initial));
+          writeScopedWorkspaceItem('duties', JSON.stringify(initial));
         } catch (e) {}
         return initial;
       }
@@ -195,7 +199,7 @@ export default function DutiesPage() {
       });
 
       try {
-        localStorage.setItem('4b_duties', JSON.stringify(updated));
+        writeScopedWorkspaceItem('duties', JSON.stringify(updated));
       } catch (e) {}
 
       return updated;
@@ -239,7 +243,7 @@ export default function DutiesPage() {
 
     setDuties(rotatedDuties);
     try {
-      localStorage.setItem('4b_duties', JSON.stringify(rotatedDuties));
+      writeScopedWorkspaceItem('duties', JSON.stringify(rotatedDuties));
     } catch (e) {}
     toast.success('Đã xoay vòng lịch trực nhật!');
   };
@@ -262,7 +266,7 @@ export default function DutiesPage() {
     setDuties(prev => {
       const updated = [...prev, newDuty];
       try {
-        localStorage.setItem('4b_duties', JSON.stringify(updated));
+        writeScopedWorkspaceItem('duties', JSON.stringify(updated));
       } catch (e) {}
       return updated;
     });
@@ -285,7 +289,7 @@ export default function DutiesPage() {
           : d
       );
       try {
-        localStorage.setItem('4b_duties', JSON.stringify(updated));
+        writeScopedWorkspaceItem('duties', JSON.stringify(updated));
       } catch (e) {}
       return updated;
     });
@@ -296,7 +300,7 @@ export default function DutiesPage() {
     setDuties((prev) => {
       const updated = prev.filter((d) => d.id !== dutyId);
       try {
-        localStorage.setItem('4b_duties', JSON.stringify(updated));
+        writeScopedWorkspaceItem('duties', JSON.stringify(updated));
       } catch (e) {}
       return updated;
     });
@@ -382,7 +386,7 @@ export default function DutiesPage() {
 
           {/* Week Navigation */}
           <div
-            className="flex items-center justify-between border-b px-4 py-3"
+            className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
             style={{ borderColor: 'var(--border)', background: 'var(--bg-light)' }}
           >
             <button
@@ -393,7 +397,7 @@ export default function DutiesPage() {
               <i className="fa-solid fa-chevron-left mr-1" />
               Tuần trước
             </button>
-            <div className="flex items-center gap-2">
+            <div className="order-first flex items-center justify-center gap-2 sm:order-none">
               <span className="font-semibold" style={{ color: 'var(--dark)' }}>
                 {weekRangeText}
               </span>
@@ -429,11 +433,8 @@ export default function DutiesPage() {
             Click vào công việc để đánh dấu hoàn thành. Nhấn nút &quot;Xoay Vòng&quot; để tự động đổi người.
           </div>
 
-          {/* Weekly Grid - 7 columns */}
-          <div
-            className="grid gap-3 p-4"
-            style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}
-          >
+          {/* Weekly Grid */}
+          <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-7">
             {DAY_LABELS.map((label, dayIndex) => {
               const dayDuties = getDutiesForDay(dayIndex);
               const dayDate = getDateForDay(dayIndex);
@@ -442,7 +443,7 @@ export default function DutiesPage() {
               return (
                 <div
                   key={dayIndex}
-                  className={`min-h-[200px] rounded-xl border p-2.5 transition-all ${
+                  className={`min-h-[160px] rounded-xl border p-2.5 transition-all xl:min-h-[200px] ${
                     isToday ? 'ring-2 ring-[var(--primary)]' : ''
                   }`}
                   style={
@@ -570,10 +571,10 @@ export default function DutiesPage() {
 
           {/* Summary */}
           <div
-            className="mx-4 mb-4 flex items-center justify-between rounded-xl border p-3"
+            className="mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3"
             style={{ borderColor: 'var(--border)', background: 'var(--bg-light)' }}
           >
-            <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
+            <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
               <span>
                 <i className="fa-solid fa-list-check mr-1" style={{ color: 'var(--primary)' }} />
                 Tổng: <strong>{duties.length}</strong> việc

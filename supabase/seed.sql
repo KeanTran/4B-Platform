@@ -1,0 +1,3 @@
+-- Phase 1 intentionally ships without shared seed data.
+-- Guest examples are generated locally in the browser and must not be inserted
+-- into the authenticated workspace table.
