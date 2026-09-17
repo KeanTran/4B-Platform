@@ -4,6 +4,8 @@ export { Hero } from './Hero';
 export { StatsBar } from './StatsBar';
 export { About } from './About';
 export { Features } from './Features';
+export { HowItWorks } from './HowItWorks';
+export { ProSpotlight } from './ProSpotlight';
 export { Pricing } from './Pricing';
 export { Testimonials } from './Testimonials';
 export { Blog } from './Blog';

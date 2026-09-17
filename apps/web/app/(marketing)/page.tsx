@@ -6,17 +6,21 @@ import { Pricing } from '@/components/marketing/Pricing';
 import { Blog } from '@/components/marketing/Blog';
 import { FAQ } from '@/components/marketing/FAQ';
 import { RegisterSection } from '@/components/marketing/RegisterSection';
+import { HowItWorks } from '@/components/marketing/HowItWorks';
+import { ProSpotlight } from '@/components/marketing/ProSpotlight';
 
 export default function HomePage() {
   return (
     <>
       <Hero />
       <StatsBar />
-      <About />
       <Features />
+      <HowItWorks />
+      <ProSpotlight />
+      <About />
       <Pricing />
-      <Blog />
       <FAQ />
+      <Blog />
       <RegisterSection />
     </>
   );

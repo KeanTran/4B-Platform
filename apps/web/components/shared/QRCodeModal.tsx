@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Modal } from './Modal';
 import { useUIStore } from '@/store/ui-store';
 import { useAppStore } from '@/store/app-store';
@@ -192,12 +193,15 @@ export function QRCodeModal() {
             >
               {bankSetting ? (
                 <>
-                  <img
+                  <Image
                     src={generateQRContent(selectedMember)}
                     alt={`QR for ${selectedMember.name}`}
+                    width={250}
+                    height={250}
+                    unoptimized
                     className="h-[250px] w-[250px] object-contain"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=4B_${selectedMember.name}_${selectedMember.amount}`;
+                      e.currentTarget.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=4B_${selectedMember.name}_${selectedMember.amount}`;
                     }}
                   />
                   <p className="mt-3 text-center text-xs" style={{ color: 'var(--text-muted)' }}>

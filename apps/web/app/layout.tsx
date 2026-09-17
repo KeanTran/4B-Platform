@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Lexend } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
 import '../styles/globals.css';
 
 const inter = Inter({
@@ -38,12 +39,6 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: '4B Platform' }],
   creator: '4B Platform',
-  themeColor: '#3f7f12',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
   openGraph: {
     type: 'website',
     locale: 'vi_VN',
@@ -72,6 +67,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fffdea' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1a1a' },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -80,10 +85,6 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/logo.png" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -98,10 +99,11 @@ export default function RootLayout({
           duration={4000}
           toastOptions={{
             style: {
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-inter), sans-serif',
             },
           }}
         />
+        <AnalyticsProvider />
       </body>
     </html>
   );

@@ -13,7 +13,7 @@
 - **Tự động chia đều** chi phí cho các thành viên
 - **VietQR 1-chạm** - Thanh toán nhanh chóng bằng mã QR
 - **Nhắc nhở tự động** qua Zalo Bot (Mock)
-- **AI hỗ trợ** trả lời câu hỏi về phân bổ chi phí
+- **4B Student AI** gọi mô hình thật, hỗ trợ chia chi phí và xử lý tình huống ở ghép
 - **Quản lý nhiệm vụ** luân chuyển giữa các thành viên
 - **Dark mode** hỗ trợ
 - **Mobile-first** responsive design
@@ -32,7 +32,7 @@
 ### Backend
 
 - **Supabase** - Database, Auth, Realtime
-- **Groq API** - AI Chat (free tier)
+- **Groq + Vercel AI Gateway + AI SDK** - AI Chat thật với provider fallback và hạn mức Free/Pro phía server
 
 ### Design
 
@@ -45,8 +45,8 @@
 
 ### Yêu cầu
 
-- Node.js 18+
-- pnpm 8+
+- Node.js 22+
+- npm 10+
 
 ### Setup
 
@@ -56,7 +56,7 @@ git clone <repo-url>
 cd landingp_page
 
 # Install dependencies
-pnpm install
+npm install
 
 # Copy environment variables
 cp .env.example .env.local
@@ -65,9 +65,19 @@ cp .env.example .env.local
 # - NEXT_PUBLIC_SUPABASE_URL
 # - NEXT_PUBLIC_SUPABASE_ANON_KEY
 # - SUPABASE_SERVICE_ROLE_KEY
+# - AI_GATEWAY_API_KEY (khi chạy local)
+# - AI_GATEWAY_MODEL (mặc định openai/gpt-6-astra)
+# - GROQ_API_KEY (được ưu tiên khi có)
+# - GROQ_MODEL (mặc định openai/gpt-oss-120b)
+
+# Hoặc dùng OIDC cho AI Gateway sau khi link dự án Vercel
+npx vercel link
+npx vercel env pull apps/web/.env.local
+
+# Apply migration trong supabase/migrations bằng workflow Supabase của dự án
 
 # Run development server
-pnpm dev
+npm run dev
 ```
 
 ## Cấu trúc Project
@@ -116,16 +126,19 @@ apps/
 
 ```bash
 # Run all apps
-pnpm dev
+npm run dev
 
 # Build for production
-pnpm build
+npm run build
 
 # Lint
-pnpm lint
+npm run lint
 
 # Type check
-pnpm typecheck
+npm run typecheck
+
+# Test
+npm test
 ```
 
 ## Database Schema

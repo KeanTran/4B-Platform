@@ -19,6 +19,7 @@
   --dark-surface: #4a2d18;
   --surface: #ffffff;
   --text-main: #332113;
+  --text-heading: #754827;
   --text-muted: #826653;
   --border: #e6dfc8;
   --success: #3f7f12;
@@ -47,6 +48,16 @@
   --color-window-header-bg: #f7f3e1;
   --color-table-row-alt: #f7f3e1;
 
+  /* Liquid glass — uses only the existing cream, green and brown palette */
+  --glass-surface: rgba(255, 255, 255, 0.62);
+  --glass-surface-strong: rgba(255, 253, 234, 0.88);
+  --glass-highlight: rgba(212, 238, 125, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-border-accent: rgba(63, 127, 18, 0.2);
+  --glass-blur: 22px;
+  --glass-saturate: 145%;
+  --focus-ring: rgba(63, 127, 18, 0.42);
+
   /* Spacing scale */
   --space-1: 4px;
   --space-2: 8px;
@@ -58,11 +69,16 @@
   --space-8: 40px;
 
   /* Radius & shadow */
+  --radius-xl: 28px;
   --radius-lg: 20px;
-  --radius-md: 12px;
+  --radius-md: 14px;
   --radius-sm: 8px;
   --shadow: 0 10px 30px -10px rgba(63, 127, 18, 0.15);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-soft: 0 12px 40px rgba(117, 72, 39, 0.08);
+  --shadow-brand-sm: 0 4px 12px rgba(63, 127, 18, 0.24);
+  --shadow-brand: 0 12px 30px rgba(63, 127, 18, 0.22);
+  --shadow-glass: 0 24px 70px rgba(74, 45, 24, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 /* Dark mode */
@@ -70,6 +86,7 @@
   --bg-light: #1a1a1a;
   --surface: #2d2d2d;
   --text-main: #e5e5e5;
+  --text-heading: #d4a574;
   --text-muted: #a8a8a8;
   --border: #404040;
   --dark: #d4a574;
@@ -93,6 +110,14 @@
   --color-window-header-bg: #2d2d2d;
   --color-table-row-alt: #353535;
   --gradient-dark: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  --glass-surface: rgba(45, 45, 45, 0.62);
+  --glass-surface-strong: rgba(26, 26, 26, 0.88);
+  --glass-highlight: rgba(212, 238, 125, 0.1);
+  --glass-border: rgba(212, 238, 125, 0.16);
+  --glass-border-accent: rgba(212, 238, 125, 0.25);
+  --focus-ring: rgba(212, 238, 125, 0.5);
+  --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.22);
+  --shadow-glass: 0 24px 70px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ====================================
@@ -110,15 +135,19 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-inter), 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--bg-light);
+  background-image:
+    radial-gradient(circle at 8% 4%, rgba(212, 238, 125, 0.22), transparent 32rem),
+    radial-gradient(circle at 92% 12%, rgba(249, 162, 61, 0.12), transparent 28rem);
+  background-attachment: fixed;
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, .brand-font {
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-lexend), var(--font-inter), sans-serif;
 }
 
 img, svg {
@@ -159,6 +188,58 @@ textarea:focus-visible,
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .glass-surface,
+  .glass-surface-strong {
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+
+  .glass-surface {
+    background: var(--glass-surface);
+  }
+
+  .glass-surface-strong {
+    background: var(--glass-surface-strong);
+  }
+
+  .glass-nav {
+    background: var(--glass-surface-strong);
+    border-color: var(--glass-border);
+    box-shadow: 0 12px 36px rgba(74, 45, 24, 0.08);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+
+  .interactive-lift {
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .interactive-lift:hover {
+    transform: translateY(-3px);
+    border-color: var(--glass-border-accent);
+    box-shadow: var(--shadow-brand);
+  }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glass-surface,
+  .glass-surface-strong,
+  .glass-nav {
+    background: var(--surface);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-surface,
+  .glass-surface-strong,
+  .glass-nav {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
@@ -211,4 +292,24 @@ textarea:focus-visible,
 .fade-on-scroll.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .fade-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
 }

@@ -6,12 +6,22 @@ const FAQS = [
   {
     question: '4B có miễn phí không?',
     answer:
-      'Có! 4B hoàn toàn miễn phí cho sinh viên và người ở ghép với tối đa 4 thành viên. Không giới hạn tính năng cơ bản, không thẻ tín dụng required.',
+      'Có. Bạn có thể vào thẳng Dashboard, dùng các công cụ cơ bản và quản lý phòng tối đa 4 thành viên mà không cần thẻ tín dụng.',
   },
   {
-    question: 'Làm sao để bắt đầu sử dụng 4B?',
+    question: 'Tôi có cần đăng nhập trước khi dùng không?',
     answer:
-      'Rất đơn giản! Chỉ cần đăng ký tài khoản, tạo phòng trọ, thêm thành viên, và bắt đầu thêm các khoản chi phí. Hệ thống sẽ tự động tính toán và phân bổ cho từng người.',
+      'Không. Dashboard, công cụ chia tiền, lịch trực và 4B AI đều có thể mở ở chế độ khách. Dữ liệu khách được lưu trên thiết bị; đăng nhập khi bạn muốn dùng không gian riêng và chuẩn bị đồng bộ.',
+  },
+  {
+    question: 'Free và Pro khác nhau như thế nào?',
+    answer:
+      'Free giữ lại toàn bộ trải nghiệm thiết yếu với hạn mức phù hợp cho phòng nhỏ. Pro tăng số thành viên, lượt dùng AI, thời gian lưu lịch sử và mở các báo cáo nâng cao.',
+  },
+  {
+    question: 'Tôi có thể thử AI trước khi nâng cấp Pro không?',
+    answer:
+      'Có. Gói Free có một số lượt hỏi AI mỗi tháng để bạn trải nghiệm. Pro dành cho người cần sử dụng thường xuyên hơn.',
   },
   {
     question: '4B có hỗ trợ thanh toán qua VietQR không?',

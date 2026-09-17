@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Modal } from '@/components/shared/Modal';
 import { useUIStore } from '@/store/ui-store';
 
@@ -214,9 +215,12 @@ export function DemoModal() {
                       className="rounded-xl border p-3"
                       style={{ background: 'white' }}
                     >
-                      <img
+                      <Image
                         src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=BANK_TRANSFER|MB|090xxx888|1200000|4B_PHONG302_HALINH"
                         alt="VietQR demo"
+                        width={120}
+                        height={120}
+                        unoptimized
                         className="h-[120px] w-[120px]"
                       />
                     </div>

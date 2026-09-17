@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatVND } from '@/lib/split';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
@@ -101,7 +102,7 @@ export default function DashboardPage() {
   }, [expenses]);
 
   // Calculate allocated amount for each member based on real expenses
-  const getMemberAmount = (memberId: string): number => {
+  const getMemberAmount = useCallback((memberId: string): number => {
     if (expenses.length === 0 || members.length === 0) return 0;
 
     let total = 0;
@@ -118,7 +119,7 @@ export default function DashboardPage() {
       }
     });
     return total;
-  };
+  }, [expenses, members.length]);
 
   // Build members list with dynamic name, computed amount, and payment status
   const membersWithPayment = useMemo(() => {
@@ -135,7 +136,7 @@ export default function DashboardPage() {
         amount,
       };
     });
-  }, [members, ownerDisplayName, memberPayments, expenses]);
+  }, [members, ownerDisplayName, memberPayments, getMemberAmount]);
 
   // Real paid & pending calculations
   const paidMembers = membersWithPayment.filter((m) => m.paid);
@@ -425,17 +426,17 @@ export default function DashboardPage() {
         </div>
 
         {/* 2-column grid */}
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-2">
           {/* Left: Member table */}
           <div
-            className="rounded-2xl border"
+            className="min-w-0 rounded-2xl border"
             style={{
               background: 'var(--surface)',
               borderColor: 'var(--border)',
             }}
           >
             <div
-              className="flex items-center justify-between border-b px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3"
               style={{ borderColor: 'var(--border)' }}
             >
               <div className="flex items-center gap-2">
@@ -622,7 +623,7 @@ export default function DashboardPage() {
 
           {/* Right: VietQR Card */}
           <div
-            className="rounded-2xl border p-5 text-center"
+            className="min-w-0 rounded-2xl border p-5 text-center"
             style={{
               background: 'var(--surface)',
               borderColor: 'var(--border)',
@@ -645,12 +646,15 @@ export default function DashboardPage() {
               className="mx-auto mb-4 inline-flex items-center justify-center rounded-2xl p-4 shadow-sm"
               style={{ background: 'white' }}
             >
-              <img
+              <Image
                 src={qrImageUrl}
                 alt="VietQR"
+                width={230}
+                height={230}
+                unoptimized
                 className="h-[210px] w-[210px] sm:h-[230px] sm:w-[230px] object-contain transition-transform hover:scale-105"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=230x230&data=4B_${roomNameClean}_${qrAmount}`;
+                  e.currentTarget.src = `https://api.qrserver.com/v1/create-qr-code/?size=230x230&data=4B_${roomNameClean}_${qrAmount}`;
                 }}
               />
             </div>
@@ -672,7 +676,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
               <button
                 onClick={handleOpenQR}
                 className="rounded-lg border px-4 py-2 text-xs font-semibold transition-colors hover:bg-[var(--bg-light)]"

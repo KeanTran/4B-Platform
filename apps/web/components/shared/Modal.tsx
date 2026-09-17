@@ -52,11 +52,7 @@ export function Modal({ id, title, children, size = 'md', showClose = true }: Mo
 
       {/* Modal Content */}
       <div
-        className={`relative w-full ${sizeClasses[size]} mx-4 rounded-2xl border p-6 shadow-xl`}
-        style={{
-          background: 'var(--surface)',
-          borderColor: 'var(--border)',
-        }}
+        className={`glass-surface-strong relative w-full ${sizeClasses[size]} mx-4 rounded-[var(--radius-xl)] p-6`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

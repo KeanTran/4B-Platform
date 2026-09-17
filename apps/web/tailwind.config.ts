@@ -34,17 +34,20 @@ const config: Config = {
         border: 'var(--border)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Lexend', 'Inter', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-lexend)', 'var(--font-inter)', 'sans-serif'],
       },
       borderRadius: {
+        xl: 'var(--radius-xl)',
         lg: 'var(--radius-lg)',
         md: 'var(--radius-md)',
         sm: 'var(--radius-sm)',
       },
       boxShadow: {
-        'brand': '0 10px 30px -10px rgba(63, 127, 18, 0.15)',
-        'brand-md': '0 4px 12px rgba(63, 127, 18, 0.3)',
+        'brand': 'var(--shadow-brand)',
+        'brand-md': 'var(--shadow-brand-sm)',
+        'soft': 'var(--shadow-soft)',
+        'glass': 'var(--shadow-glass)',
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',

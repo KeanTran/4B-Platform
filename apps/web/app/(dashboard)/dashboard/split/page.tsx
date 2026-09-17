@@ -5,6 +5,7 @@ import { formatVND } from '@/lib/split';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics';
 
 type SplitMode = 'equal' | 'ratio' | 'days';
 
@@ -175,6 +176,11 @@ export default function SplitPage() {
     };
 
     addExpense(newExpense);
+    trackEvent('split_completed', {
+      split_mode: splitMode,
+      member_count: members.length,
+      amount_band: total < 500000 ? 'under_500k' : total < 2000000 ? '500k_to_2m' : 'over_2m',
+    });
     setShowPreview(false);
     setExpenseTitle('');
     setExpenseValue('');

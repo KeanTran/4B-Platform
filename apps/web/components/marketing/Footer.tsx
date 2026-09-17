@@ -7,9 +7,10 @@ const FOOTER_LINKS = {
   product: {
     title: 'Sản phẩm',
     links: [
-      { label: 'Tính năng', href: '#features' },
-      { label: 'Bảng giá', href: '#pricing' },
-      { label: 'Đánh giá', href: '#testimonials' },
+      { label: 'Dashboard miễn phí', href: '/dashboard' },
+      { label: 'Bộ công cụ', href: '#features' },
+      { label: 'Cách sử dụng', href: '#how-it-works' },
+      { label: 'Gói Free & Pro', href: '#pricing' },
       { label: 'FAQ', href: '#faq' },
     ],
   },
@@ -58,7 +59,7 @@ export function Footer() {
               style={{ color: 'var(--color-text-cream-soft)' }}
             >
               Giải pháp chia chi phí phòng trọ sòng phẳng & êm đẹp. Tự động hóa tính toán,
-              VietQR 1-chạm, nhắc nợ tự động.
+              VietQR 1-chạm và AI hỗ trợ cuộc sống ở ghép.
             </p>
             <div className="flex items-center gap-3">
               <a

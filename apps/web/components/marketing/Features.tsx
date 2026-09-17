@@ -1,121 +1,151 @@
 'use client';
 
-const FEATURES = [
+import Link from 'next/link';
+import {
+  ArrowUpRight,
+  Bot,
+  CalendarCheck2,
+  BarChart3,
+  QrCode,
+  ReceiptText,
+  UsersRound,
+} from 'lucide-react';
+import { Card } from '@/components/ui/Card';
+import { trackEvent } from '@/lib/analytics';
+
+const PRODUCTS = [
   {
-    icon: 'fa-calculator',
-    title: 'Tự Động Chia Đều',
-    description:
-      'Chỉ cần nhập tổng hóa đơn điện/nước/internet, 4B sẽ tự động tính và phân bổ cho từng thành viên một cách công bằng.',
-    color: 'var(--primary)',
-    bgColor: 'var(--color-bg-soft-primary)',
-    borderColor: 'var(--color-border-soft-primary)',
+    icon: BarChart3,
+    name: 'Dashboard phòng',
+    description: 'Nhìn nhanh tổng chi, khoản đã thu và số tiền còn thiếu trong một màn hình.',
+    href: '/dashboard',
+    label: 'Free',
+    accent: 'primary',
   },
   {
-    icon: 'fa-qrcode',
-    title: 'VietQR 1-Chạm',
-    description:
-      'Tạo mã QR thanh toán cho từng thành viên. Bạn cùng phòng chỉ cần quét và chuyển khoản — không cần nhắn tin đòi.',
-    color: 'var(--accent)',
-    bgColor: 'var(--accent-light)',
-    borderColor: '#f9c78a',
+    icon: ReceiptText,
+    name: 'Chia tiền linh hoạt',
+    description: 'Chia đều, theo tỷ lệ hoặc theo số ngày ở mà không cần tự tính lại.',
+    href: '/dashboard/split',
+    label: 'Free',
+    accent: 'accent',
   },
   {
-    icon: 'fa-bell',
-    title: 'Nhắc Nhở Tự Động',
-    description:
-      'Hệ thống tự động nhắc nhở qua Zalo Bot khi đến hạn đóng tiền. Không còn cảnh quên hay lười nhắc.',
-    color: '#0084ff',
-    bgColor: '#e6f0ff',
-    borderColor: '#b3d1ff',
+    icon: CalendarCheck2,
+    name: 'Lịch trực nhật',
+    description: 'Phân công việc nhà rõ ràng để trách nhiệm không dồn vào một người.',
+    href: '/dashboard/duties',
+    label: 'Free',
+    accent: 'primary',
   },
   {
-    icon: 'fa-scale-balanced',
-    title: 'Sòng Phẳng & Minh Bạch',
-    description:
-      'Mọi khoản thu chi được ghi lại rõ ràng. Không ai phải nghi ngờ ai, không còn tranh chấp tiền bạc.',
-    color: 'var(--primary)',
-    bgColor: 'var(--color-bg-soft-primary)',
-    borderColor: 'var(--color-border-soft-primary)',
+    icon: QrCode,
+    name: 'VietQR cá nhân',
+    description: 'Tạo QR đúng số tiền và nội dung, giúp mỗi lần chuyển khoản bớt một bước.',
+    href: '/dashboard',
+    label: 'Free',
+    accent: 'accent',
   },
   {
-    icon: 'fa-robot',
-    title: 'AI Hỗ Trợ Thông Minh',
-    description:
-      'Trợ lý AI giúp trả lời câu hỏi về phân bổ chi phí, đề xuất cách chia hợp lý dựa trên tình huống thực tế.',
-    color: 'var(--dark)',
-    bgColor: 'var(--bg-light)',
-    borderColor: 'var(--border)',
+    icon: Bot,
+    name: '4B Student Pro AI',
+    description: 'Hỏi cách chia hợp lý, soạn lời nhắc tinh tế và hiểu nhanh tình hình chi tiêu.',
+    href: '/dashboard/ai',
+    label: 'Free có hạn mức',
+    accent: 'pro',
   },
   {
-    icon: 'fa-mobile-screen',
-    title: 'Mobile-First',
-    description:
-      'Giao diện được tối ưu cho điện thoại — nơi sinh viên sử dụng nhiều nhất. Mọi thao tác chỉ trong vài tap.',
-    color: 'var(--danger)',
-    bgColor: 'var(--color-bg-warning-soft)',
-    borderColor: 'var(--color-border-warning-soft)',
+    icon: UsersRound,
+    name: 'Không gian đồng bộ',
+    description: 'Đăng nhập để chuẩn bị đồng bộ dữ liệu riêng của phòng trên nhiều thiết bị.',
+    href: '/register',
+    label: 'Tài khoản',
+    accent: 'primary',
   },
-];
+] as const;
+
+const ACCENT_STYLES = {
+  primary: {
+    iconBackground: 'var(--color-bg-soft-primary)',
+    iconColor: 'var(--primary)',
+  },
+  accent: {
+    iconBackground: 'var(--accent-light)',
+    iconColor: 'var(--accent)',
+  },
+  pro: {
+    iconBackground: 'var(--dark)',
+    iconColor: 'var(--warning)',
+  },
+} as const;
 
 export function Features() {
   return (
-    <section
-      id="features"
-      className="mx-auto max-w-[1240px] px-[5%] py-[80px]"
-    >
-      <div className="mb-12 text-center">
-        <h2
-          className="brand-font mb-3 text-3xl font-extrabold md:text-[36px]"
-          style={{ color: 'var(--dark)' }}
+    <section id="features" className="mx-auto max-w-[1240px] px-[5%] py-20">
+      <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-2xl">
+          <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--primary)' }}>
+            Bộ công cụ 4B
+          </p>
+          <h2 className="brand-font text-3xl font-extrabold leading-tight md:text-[42px]" style={{ color: 'var(--text-heading)' }}>
+            Chọn đúng công cụ cho việc đang làm
+          </h2>
+          <p className="mt-4 text-base leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Không cần học một hệ thống phức tạp. Mỗi nhu cầu là một công cụ rõ ràng và có thể mở dùng ngay.
+          </p>
+        </div>
+        <Link
+          href="/dashboard"
+          onClick={() => trackEvent('cta_clicked', { location: 'product_catalog', destination: 'dashboard' })}
+          className="inline-flex items-center gap-2 text-sm font-bold no-underline"
+          style={{ color: 'var(--primary)' }}
         >
-          Tính Năng Nổi Bật
-        </h2>
-        <p
-          className="text-base"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          Tất cả những gì bạn cần để quản lý phòng trọ dễ dàng
-        </p>
+          Xem toàn bộ Dashboard
+          <ArrowUpRight size={16} />
+        </Link>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((feature, index) => (
-          <div
-            key={index}
-            className="group rounded-2xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
-            style={{
-              background: 'var(--surface)',
-              borderColor: 'var(--border)',
-            }}
-          >
-            <div
-              className="mb-4 flex h-[52px] w-[52px] items-center justify-center rounded-xl transition-transform group-hover:scale-110"
-              style={{
-                background: feature.bgColor,
-                borderWidth: 1,
-                borderColor: feature.borderColor,
-                borderStyle: 'solid',
-              }}
-            >
-              <i
-                className={`fa-solid ${feature.icon} text-2xl`}
-                style={{ color: feature.color }}
-              />
-            </div>
-            <h3
-              className="mb-2 text-lg font-bold"
-              style={{ color: 'var(--dark)' }}
-            >
-              {feature.title}
-            </h3>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              {feature.description}
-            </p>
-          </div>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {PRODUCTS.map((product) => {
+          const Icon = product.icon;
+          const accent = ACCENT_STYLES[product.accent];
+
+          return (
+            <Card key={product.name} variant="glass" className="interactive-lift group flex h-full flex-col p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{ background: accent.iconBackground, color: accent.iconColor }}
+                >
+                  <Icon size={23} />
+                </span>
+                <span
+                  className="rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide"
+                  style={{ borderColor: 'var(--glass-border-accent)', color: 'var(--text-muted)' }}
+                >
+                  {product.label}
+                </span>
+              </div>
+
+              <h3 className="brand-font mt-5 text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
+                {product.name}
+              </h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                {product.description}
+              </p>
+
+              <Link
+                href={product.href}
+                onClick={() => trackEvent('cta_clicked', { location: 'product_card', destination: product.href })}
+                className="mt-5 inline-flex items-center gap-2 text-sm font-bold no-underline"
+                style={{ color: 'var(--primary)' }}
+              >
+                Dùng công cụ
+                <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </Card>
+          );
+        })}
       </div>
     </section>
   );

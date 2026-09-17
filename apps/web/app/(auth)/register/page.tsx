@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { BrandLogo } from '@/components/shared/BrandLogo';
 import { createClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/store/app-store';
+import { trackEvent } from '@/lib/analytics';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -90,6 +91,7 @@ export default function RegisterPage() {
           created_at: data.user.created_at,
           updated_at: data.user.created_at,
         });
+        trackEvent('signup_completed', { method: 'password', session_created: true });
 
         toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
         router.push('/dashboard');
@@ -112,11 +114,13 @@ export default function RegisterPage() {
             created_at: signInData.user.created_at,
             updated_at: signInData.user.created_at,
           });
+          trackEvent('signup_completed', { method: 'password', session_created: true });
 
           toast.success('Đăng ký thành công! Đang chuyển đến bảng điều khiển...');
           router.push('/dashboard');
           router.refresh();
         } else {
+          trackEvent('signup_completed', { method: 'password', session_created: false });
           toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
           router.push('/login');
         }

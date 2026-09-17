@@ -1,219 +1,97 @@
-'use client';
+import Link from 'next/link';
+import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
+import { AIChatExperience } from '@/components/shared/AIChatExperience';
 
-import { toast } from 'sonner';
+const BENEFITS = [
+  {
+    icon: Sparkles,
+    title: 'Hiểu chuyện ở ghép',
+    description: 'Tập trung vào chi phí, việc nhà và giao tiếp trong phòng.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Riêng tư từ thiết kế',
+    description: '4B không lưu nội dung câu hỏi và câu trả lời vào database.',
+  },
+  {
+    icon: Zap,
+    title: 'Pro nhiều không gian hơn',
+    description: '100 lượt mỗi tháng cho những lúc bạn thật sự cần trợ giúp.',
+  },
+];
 
 export default function AIPage() {
-  const handleUpgrade = () => {
-    toast.info('Tính năng Pro - Liên hệ support@4b.vn để nâng cấp!');
-  };
-
   return (
     <div className="space-y-5">
-      {/* Tab 4B Student Pro AI */}
-      <div id="tab-ai">
-        {/* AI Card */}
-        <div
-          className="rounded-2xl border p-5"
-          style={{
-            background: 'var(--gradient-dark)',
-            borderColor: 'var(--dark-surface)',
-          }}
-        >
-          {/* Header */}
-          <div
-            className="mb-4 flex flex-wrap items-center justify-between gap-3"
-          >
-            <div className="flex items-center gap-2">
-              <i className="fa-solid fa-wand-magic-sparkles text-lg" style={{ color: 'var(--warning)' }} />
-              <span className="font-semibold text-white">
-                4B Student Pro AI — Phân Tích & Dự Báo Tiết Kiệm
-              </span>
-            </div>
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{
-                background: 'rgba(255, 224, 102, 0.2)',
-                color: 'var(--warning)',
-              }}
-            >
-              Pro Feature
-            </span>
+      <section className="overflow-hidden rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass-surface)] p-5 shadow-[var(--shadow-glass)] backdrop-blur-[var(--glass-blur)] md:p-7">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0 overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
+            <AIChatExperience variant="page" />
           </div>
 
-          {/* AI Cards Grid */}
-          <div
-            className="grid gap-4 md:grid-cols-2"
-          >
-            {/* Card 1: Dự báo chi phí */}
-            <div
-              className="rounded-xl border p-4"
-              style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                borderColor: 'rgba(255, 255, 255, 0.12)',
-              }}
-            >
-              <div
-                className="mb-2 text-xs font-bold"
-                style={{ color: 'var(--primary-light)' }}
-              >
-                <i className="fa-solid fa-crystal-ball mr-1" />
-                AI Dự Báo Chi Phí Tháng T9
-              </div>
-              <p className="text-sm leading-relaxed text-white/80">
-                Dựa trên lịch sử tiêu thụ và xu hướng thời tiết nắng nóng,
-                AI dự báo tổng hóa đơn tháng tới của phòng sẽ rơi vào khoảng{' '}
-                <strong className="text-white">5,150,000 đ</strong>
-                <span className="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style={{ background: 'rgba(255, 224, 102, 0.2)', color: 'var(--warning)' }}>
-                  +7%
-                </span>
-                . Nên chủ động chuẩn bị quỹ phòng.
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <button
-                  onClick={handleUpgrade}
-                  className="rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/10"
-                  style={{
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                  }}
-                >
-                  <i className="fa-solid fa-chart-line mr-1" />
-                  Xem chi tiết
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Gợi ý tiết kiệm */}
-            <div
-              className="rounded-xl border p-4"
-              style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                borderColor: 'rgba(255, 255, 255, 0.12)',
-              }}
-            >
-              <div
-                className="mb-2 text-xs font-bold"
-                style={{ color: 'var(--warning)' }}
-              >
-                <i className="fa-solid fa-lightbulb mr-1" />
-                AI Gợi Ý Tiết Kiệm Cá Nhân Hóa
-              </div>
-              <p className="text-sm leading-relaxed text-white/80">
-                Hệ thống nhận thấy phòng chi khoảng{' '}
-                <strong className="text-white">280,000 đ/tháng</strong> cho việc
-                mua nước đóng chai. AI gợi ý chuyển sang đổi nước bình nhóm lớn
-                để tiết kiệm đến{' '}
-                <strong className="text-[var(--primary-light)]">15% chi phí</strong>{' '}
-                hàng tháng.
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <button
-                  onClick={handleUpgrade}
-                  className="rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/10"
-                  style={{
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                  }}
-                >
-                  <i className="fa-solid fa-piggy-bank mr-1" />
-                  Áp dụng ngay
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* More AI Features */}
-          <div
-            className="mt-4 grid gap-3 md:grid-cols-3"
-          >
-            <div
-              className="flex items-center gap-3 rounded-xl border p-3"
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                borderColor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ background: 'rgba(63, 127, 18, 0.3)' }}
-              >
-                <i className="fa-solid fa-chart-bar text-white" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-white">Phân Tích Xu Hướng</div>
-                <div className="text-xs text-white/60">Theo dõi chi tiêu 3 tháng</div>
-              </div>
-            </div>
-
-            <div
-              className="flex items-center gap-3 rounded-xl border p-3"
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                borderColor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ background: 'rgba(249, 162, 61, 0.3)' }}
-              >
-                <i className="fa-solid fa-bell text-white" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-white">Nhắc Nhở Thông Minh</div>
-                <div className="text-xs text-white/60">Tự động nhắc trước hạn</div>
-              </div>
-            </div>
-
-            <div
-              className="flex items-center gap-3 rounded-xl border p-3"
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                borderColor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ background: 'rgba(0, 132, 255, 0.3)' }}
-              >
-                <i className="fa-solid fa-users text-white" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-white">So Sánh Chi Phí</div>
-                <div className="text-xs text-white/60">Với các phòng khác</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Upgrade CTA */}
-          <div
-            className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
-            style={{
-              background: 'rgba(212, 238, 125, 0.1)',
-              borderColor: 'rgba(212, 238, 125, 0.2)',
-            }}
-          >
+          <aside className="space-y-4">
             <div>
-              <div className="text-sm font-semibold text-white">
-                Mở khóa tất cả tính năng AI
-              </div>
-              <div className="text-xs text-white/60">
-                Chỉ với 29,000đ/tháng - Giới hạn 100 đề xuất/tháng
-              </div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-bg-soft-primary)] px-3 py-1 text-xs font-bold text-[var(--primary-dark)]">
+                <Sparkles size={13} aria-hidden="true" />
+                4B Student AI
+              </span>
+              <h1 className="brand-font mt-4 text-2xl font-black text-[var(--text-heading)] md:text-3xl">
+                Một người bạn biết cách cân bằng
+              </h1>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
+                Free vẫn dùng được AI thật. Pro dành cho người muốn hỏi nhiều hơn,
+                xử lý nhiều tình huống hơn và không bị ngắt mạch giữa tháng.
+              </p>
             </div>
-            <button
-              onClick={handleUpgrade}
-              className="rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
-              style={{
-                background: 'var(--gradient-primary)',
-                boxShadow: '0 4px 12px rgba(63, 127, 18, 0.4)',
-              }}
-            >
-              <i className="fa-solid fa-rocket mr-1" />
-              Nâng cấp Pro
-            </button>
-          </div>
+
+            <div className="space-y-3">
+              {BENEFITS.map(({ icon: Icon, title, description }) => (
+                <div
+                  key={title}
+                  className="flex gap-3 rounded-2xl border border-[var(--border)] bg-[var(--glass-surface-strong)] p-3.5"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--glass-highlight)] text-[var(--primary)]">
+                    <Icon size={17} aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--text-heading)]">
+                      {title}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">
+                      {description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl [background:var(--gradient-dark)] p-5 text-white shadow-[var(--shadow-soft)]">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-bold">4B Pro</p>
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold text-[var(--warning)]">
+                  100 lượt/tháng
+                </span>
+              </div>
+              <ul className="mt-3 space-y-2 text-xs text-white/80">
+                <li className="flex items-center gap-2">
+                  <Check size={14} className="text-[var(--primary-light)]" />
+                  Gấp 20 lần hạn mức Free
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check size={14} className="text-[var(--primary-light)]" />
+                  Tiếp tục dùng toàn bộ công cụ 4B
+                </li>
+              </ul>
+              <Link
+                href="/register?plan=pro"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[var(--primary-light)] px-4 py-2.5 text-sm font-black text-[var(--primary-dark)] transition hover:-translate-y-0.5"
+              >
+                Khám phá gói Pro
+              </Link>
+            </div>
+          </aside>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -46,3 +46,5 @@ npm-debug.log
 .claude/
 CLAUDE.md
 index.html
+.vercel
+.env*

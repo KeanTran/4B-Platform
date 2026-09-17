@@ -10,6 +10,7 @@ import { useAppStore } from '@/store/app-store';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import type { User } from '@/types';
+import { trackEvent } from '@/lib/analytics';
 
 const NAV_ITEMS = [
   {
@@ -119,6 +120,16 @@ export default function DashboardLayout({
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!sessionReady || !workspaceReady || user) return;
+
+    const eventKey = '4b-dashboard-guest-started';
+    if (window.sessionStorage.getItem(eventKey)) return;
+
+    window.sessionStorage.setItem(eventKey, 'true');
+    trackEvent('dashboard_guest_started', { entry_path: pathname });
+  }, [pathname, sessionReady, user, workspaceReady]);
+
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -173,11 +184,10 @@ export default function DashboardLayout({
     <div className="flex min-h-screen" style={{ background: 'var(--bg-light)' }}>
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 hidden h-full flex-col border-r transition-all duration-300 md:flex ${
+        className={`glass-surface-strong fixed left-0 top-0 z-40 hidden h-full flex-col border-r transition-all duration-300 md:flex ${
           sidebarOpen ? 'w-[260px]' : 'w-[72px]'
         }`}
         style={{
-          background: 'var(--surface)',
           borderColor: 'var(--border)',
         }}
       >
@@ -302,8 +312,8 @@ export default function DashboardLayout({
             className="fixed inset-0 z-40 bg-black/40 md:hidden"
           />
           <aside
-            className="fixed inset-y-0 left-0 z-50 flex w-[min(82vw,320px)] flex-col border-r shadow-2xl md:hidden"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            className="glass-surface-strong fixed inset-y-0 left-0 z-50 flex w-[min(82vw,320px)] flex-col border-r shadow-2xl md:hidden"
+            style={{ borderColor: 'var(--border)' }}
           >
             <div
               className="flex h-14 items-center justify-between border-b px-4"
@@ -376,9 +386,8 @@ export default function DashboardLayout({
       >
         {/* Top Bar */}
         <header
-          className="sticky top-0 z-30 flex h-14 items-center justify-between border-b px-3 sm:px-6"
+          className="glass-nav sticky top-0 z-30 flex h-14 items-center justify-between border-b px-3 sm:px-6"
           style={{
-            background: 'var(--bg-light)',
             borderColor: 'var(--border)',
           }}
         >
@@ -414,11 +423,7 @@ export default function DashboardLayout({
               </button>
               {profileOpen && (
                 <div
-                  className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border shadow-lg"
-                  style={{
-                    background: 'var(--surface)',
-                    borderColor: 'var(--border)',
-                  }}
+                  className="glass-surface-strong absolute right-0 top-full z-50 mt-2 w-56 rounded-xl"
                 >
                   <div
                     className="border-b px-4 py-3"
@@ -498,9 +503,8 @@ export default function DashboardLayout({
 
         {!user && (
           <div
-            className="mx-3 mt-3 flex flex-col gap-3 rounded-2xl border p-4 sm:mx-5 sm:flex-row sm:items-center sm:justify-between"
+            className="glass-surface mx-3 mt-3 flex flex-col gap-3 rounded-2xl p-4 sm:mx-5 sm:flex-row sm:items-center sm:justify-between"
             style={{
-              background: 'var(--color-bg-soft-primary)',
               borderColor: 'var(--color-border-soft-primary)',
             }}
           >

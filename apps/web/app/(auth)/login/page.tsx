@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { BrandLogo } from '@/components/shared/BrandLogo';
 import { createClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/store/app-store';
+import { trackEvent } from '@/lib/analytics';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function LoginPage() {
           updated_at: data.user.updated_at || data.user.created_at,
         };
         activateWorkspace(appUser);
+        trackEvent('login_completed', { method: 'password' });
 
         toast.success('Đăng nhập thành công!');
         const requestedPath = new URLSearchParams(window.location.search).get('next');

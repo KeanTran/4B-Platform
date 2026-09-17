@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Moon, Sun, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Moon, Sun, Menu, X } from 'lucide-react';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { Button } from '@/components/ui/Button';
+import { trackEvent } from '@/lib/analytics';
 
 const NAV_LINKS = [
-  { href: '#features', label: 'Tính Năng', icon: 'star' },
-  { href: '#about', label: 'Về Chúng Tôi', icon: 'building' },
-  { href: '#pricing', label: 'Gói Dịch Vụ', icon: 'tag' },
+  { href: '#features', label: 'Sản Phẩm', icon: 'store' },
+  { href: '#how-it-works', label: 'Cách Dùng', icon: 'route' },
+  { href: '#about', label: 'Về 4B', icon: 'building' },
+  { href: '#pricing', label: 'Gói Free & Pro', icon: 'tag' },
   { href: '#blog', label: 'Blog', icon: 'newspaper' },
   { href: '#faq', label: 'FAQ', icon: 'circle-question' },
-  { href: '#register', label: 'Đăng Ký', icon: 'user-plus' },
 ] as const;
 
 export function Header() {
-  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,10 +41,8 @@ export function Header() {
   return (
     <>
       <header
-        className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b backdrop-blur-md"
+        className="glass-nav fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b"
         style={{
-          background: 'rgba(255, 253, 234, 0.95)',
-          borderColor: 'var(--border)',
           padding: '12px 5%',
         }}
       >
@@ -55,7 +53,7 @@ export function Header() {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex" style={{ listStyle: 'none' }}>
+        <ul className="hidden items-center gap-7 xl:flex" style={{ listStyle: 'none' }}>
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <Link
@@ -86,52 +84,50 @@ export function Header() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          <button
+          <Button
             onClick={toggleDarkMode}
-            aria-label="Toggle dark mode"
-            className="rounded-full border px-3 py-2 text-sm font-semibold transition-all hover:bg-[var(--primary-light)]"
-            style={{
-              borderColor: 'var(--border)',
-              background: 'var(--surface)',
-              color: 'var(--text-main)',
-            }}
+            aria-label={isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
+            variant="ghost"
+            size="icon"
           >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          </Button>
 
           <button
             onClick={() => setMobileMenuOpen((s) => !s)}
             aria-label="Menu"
-            className="flex h-10 w-10 flex-col items-center justify-center gap-1 rounded-lg md:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1 rounded-lg xl:hidden"
             style={{ background: 'var(--bg-light)', border: 'none' }}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link
-            href="/login"
-            className="hidden md:inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
-            style={{
-              background: 'var(--gradient-primary)',
-              boxShadow: '0 4px 12px rgba(63, 127, 18, 0.3)',
-              textDecoration: 'none',
-            }}
-          >
-            <i className="fa-solid fa-right-to-bracket" />
-            Đăng Nhập
-          </Link>
+          <Button asChild size="sm" className="hidden xl:inline-flex">
+            <Link
+              href="/dashboard"
+              onClick={() => trackEvent('cta_clicked', { location: 'header', destination: 'dashboard' })}
+            >
+              <LayoutDashboard size={16} />
+              Dùng miễn phí
+            </Link>
+          </Button>
+
+          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+            <Link href="/login">
+              <i className="fa-solid fa-right-to-bracket" />
+              Đăng Nhập
+            </Link>
+          </Button>
         </div>
       </header>
 
       {/* Mobile menu drawer */}
       <nav
         aria-hidden={!mobileMenuOpen}
-        className={`fixed right-0 top-0 z-[60] h-screen w-[280px] transition-transform duration-300 md:hidden ${
+        className={`glass-surface-strong fixed right-0 top-0 z-[60] h-screen w-[280px] transition-transform duration-300 xl:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
-          background: 'var(--surface)',
-          boxShadow: '-4px 0 20px rgba(0,0,0,0.15)',
           padding: '16px 20px',
         }}
       >
@@ -176,6 +172,18 @@ export function Header() {
           ))}
           <li className="mt-4">
             <Link
+              href="/dashboard"
+              onClick={() => {
+                closeMobileMenu();
+                trackEvent('cta_clicked', { location: 'mobile_header', destination: 'dashboard' });
+              }}
+              className="mb-2 flex items-center gap-3 rounded-md px-4 py-3.5 text-sm font-semibold"
+              style={{ color: 'var(--primary-dark)', textDecoration: 'none', background: 'var(--primary-light)' }}
+            >
+              <LayoutDashboard size={18} />
+              Dùng miễn phí
+            </Link>
+            <Link
               href="/login"
               onClick={closeMobileMenu}
               className="flex items-center gap-3 rounded-md px-4 py-3.5 text-sm font-semibold"
@@ -192,7 +200,7 @@ export function Header() {
       {mobileMenuOpen && (
         <div
           onClick={closeMobileMenu}
-          className="fixed inset-0 z-[55] bg-black/50 md:hidden"
+          className="fixed inset-0 z-[55] bg-black/50 xl:hidden"
           aria-hidden="true"
         />
       )}

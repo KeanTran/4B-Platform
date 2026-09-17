@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import type { User, Room } from '@/types';
@@ -213,9 +214,12 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div className="relative">
               {displayAvatar ? (
-                <img
+                <Image
                   src={displayAvatar}
                   alt="Avatar"
+                  width={96}
+                  height={96}
+                  unoptimized
                   className="h-24 w-24 rounded-full object-cover"
                 />
               ) : (
