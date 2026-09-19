@@ -159,7 +159,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full">
       {/* Logo */}
       <div className="mb-8 text-center">
         <Link href="/" className="inline-flex items-center gap-2 no-underline">
@@ -181,9 +181,8 @@ export default function RegisterPage() {
 
       {/* Form */}
       <div
-        className="rounded-2xl border p-6 md:p-8"
+        className="glass-surface-strong rounded-[var(--radius-xl)] border p-6 md:p-8"
         style={{
-          background: 'var(--surface)',
           borderColor: 'var(--border)',
         }}
       >
@@ -204,6 +203,8 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Nguyễn Văn A"
               autoComplete="name"
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? 'register-name-error' : undefined}
               className="w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
               style={{
                 background: 'var(--bg-light)',
@@ -212,7 +213,7 @@ export default function RegisterPage() {
               }}
             />
             {errors.name && (
-              <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+              <p id="register-name-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                 {errors.name}
               </p>
             )}
@@ -234,6 +235,8 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="email@example.com"
               autoComplete="email"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? 'register-email-error' : undefined}
               className="w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
               style={{
                 background: 'var(--bg-light)',
@@ -242,7 +245,7 @@ export default function RegisterPage() {
               }}
             />
             {errors.email && (
-              <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+              <p id="register-email-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                 {errors.email}
               </p>
             )}
@@ -265,6 +268,8 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 placeholder="Ít nhất 8 ký tự"
                 autoComplete="new-password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'register-password-error' : undefined}
                 className="w-full rounded-lg border px-4 py-3 pr-12 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
                 style={{
                   background: 'var(--bg-light)',
@@ -275,6 +280,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
                 style={{ color: 'var(--text-muted)' }}
               >
@@ -282,7 +288,7 @@ export default function RegisterPage() {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+              <p id="register-password-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                 {errors.password}
               </p>
             )}
@@ -304,6 +310,8 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Nhập lại mật khẩu"
               autoComplete="new-password"
+              aria-invalid={Boolean(errors.confirmPassword)}
+              aria-describedby={errors.confirmPassword ? 'register-confirm-password-error' : undefined}
               className="w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
               style={{
                 background: 'var(--bg-light)',
@@ -312,7 +320,7 @@ export default function RegisterPage() {
               }}
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+              <p id="register-confirm-password-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                 {errors.confirmPassword}
               </p>
             )}
@@ -321,6 +329,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
+            aria-busy={isLoading}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:hover:translate-y-0"
             style={{
               background: 'var(--gradient-primary)',

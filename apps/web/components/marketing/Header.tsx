@@ -1,40 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Moon, Sun, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Menu, X } from 'lucide-react';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 import { trackEvent } from '@/lib/analytics';
 
 const NAV_LINKS = [
-  { href: '#features', label: 'Sản Phẩm', icon: 'store' },
-  { href: '#how-it-works', label: 'Cách Dùng', icon: 'route' },
-  { href: '#about', label: 'Về 4B', icon: 'building' },
-  { href: '#pricing', label: 'Gói Free & Pro', icon: 'tag' },
-  { href: '#blog', label: 'Blog', icon: 'newspaper' },
-  { href: '#faq', label: 'FAQ', icon: 'circle-question' },
+  { href: '/product', label: 'Sản Phẩm', icon: 'store' },
+  { href: '/how-it-works', label: 'Cách Dùng', icon: 'route' },
+  { href: '/about', label: 'Về 4B', icon: 'building' },
+  { href: '/pricing', label: 'Gói Free & Pro', icon: 'tag' },
+  { href: '/roommates', label: 'Tìm Bạn Ở Ghép', icon: 'people-roof' },
+  { href: '/blog', label: 'Blog', icon: 'newspaper' },
+  { href: '/faq', label: 'FAQ', icon: 'circle-question' },
 ] as const;
 
 export function Header() {
-  const [isDark, setIsDark] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('darkMode');
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    if (saved === 'enabled' || (saved === null && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
-    localStorage.setItem('darkMode', next ? 'enabled' : 'disabled');
-  };
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -53,11 +38,12 @@ export function Header() {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-7 xl:flex" style={{ listStyle: 'none' }}>
+        <ul className="hidden items-center gap-5 xl:flex" style={{ listStyle: 'none' }}>
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
+                prefetch
                 className="nav-link group relative inline-flex items-center gap-1.5 pb-1 text-sm font-semibold transition-colors"
                 style={{ color: 'var(--text-muted)', textDecoration: 'none' }}
                 onMouseEnter={(e) => {
@@ -84,14 +70,7 @@ export function Header() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          <Button
-            onClick={toggleDarkMode}
-            aria-label={isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
-            variant="ghost"
-            size="icon"
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </Button>
+          <ThemeToggle />
 
           <button
             onClick={() => setMobileMenuOpen((s) => !s)}
@@ -150,6 +129,7 @@ export function Header() {
             <li key={link.href}>
               <Link
                 href={link.href}
+                prefetch
                 onClick={closeMobileMenu}
                 className="flex items-center gap-3 rounded-md px-4 py-3.5 text-sm font-semibold transition-colors"
                 style={{

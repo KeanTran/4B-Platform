@@ -50,8 +50,8 @@ export default function ForgotPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <div className="w-full max-w-[460px] text-center">
+      <div className="glass-surface-strong w-full rounded-[var(--radius-xl)] p-7 text-center sm:p-9">
+        <div className="w-full">
           <div
             className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full"
             style={{ background: 'var(--color-bg-soft-primary)' }}
@@ -108,13 +108,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div
-      className="flex min-h-screen"
-      style={{ background: 'linear-gradient(135deg, var(--bg-light) 0%, #f5f0d8 100%)' }}
-    >
-      {/* Left side - Form */}
-      <div className="flex w-full items-center justify-center p-6 lg:w-1/2">
-        <div className="w-full max-w-[460px]">
+    <div className="w-full">
+      <div className="w-full">
+        <div className="w-full">
           {/* Logo */}
           <Link href="/" className="mb-8 flex items-center gap-3 no-underline">
             <BrandLogo height={44} />
@@ -128,11 +124,9 @@ export default function ForgotPasswordPage() {
 
           {/* Form Card */}
           <div
-            className="rounded-3xl border p-10 shadow-lg"
+            className="glass-surface-strong rounded-[var(--radius-xl)] border p-6 sm:p-8 lg:p-9"
             style={{
-              background: 'var(--surface)',
               borderColor: 'var(--border)',
-              boxShadow: '0 20px 60px rgba(78, 120, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04)',
             }}
           >
             <div
@@ -179,6 +173,8 @@ export default function ForgotPasswordPage() {
                   }}
                   placeholder="student@ueh.edu.vn"
                   autoComplete="email"
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? 'forgot-email-error' : undefined}
                   className="w-full rounded-xl border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
                   style={{
                     background: 'var(--bg-light)',
@@ -187,7 +183,7 @@ export default function ForgotPasswordPage() {
                   }}
                 />
                 {error && (
-                  <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+                  <p id="forgot-email-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                     {error}
                   </p>
                 )}
@@ -212,6 +208,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
+                aria-busy={isLoading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
                 style={{
                   background: 'var(--gradient-primary)',
@@ -261,48 +258,6 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
 
-      {/* Right side - Illustration (Desktop only) */}
-      <div
-        className="hidden items-center justify-center p-8 lg:flex lg:w-1/2"
-        style={{
-          background: 'var(--gradient-dark)',
-        }}
-      >
-        <div className="max-w-[400px] text-center">
-          <div
-            className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full"
-            style={{ background: 'rgba(255,255,255,0.1)' }}
-          >
-            <i className="fa-solid fa-shield-halved text-4xl text-[var(--primary-light)]" />
-          </div>
-          <h2
-            className="brand-font mb-3 text-2xl font-bold text-white"
-          >
-            Bảo mật tài khoản của bạn
-          </h2>
-          <p
-            className="text-sm leading-relaxed text-white/70"
-          >
-            Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu an toàn đến email của bạn.
-            Đảm bảo giữ email này riêng tư.
-          </p>
-
-          <div className="mt-8 space-y-3 text-left">
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <i className="fa-solid fa-lock text-[var(--primary-light)]" />
-              Mật khẩu được mã hóa an toàn
-            </div>
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <i className="fa-solid fa-clock text-[var(--primary-light)]" />
-              Link có hiệu lực trong 1 giờ
-            </div>
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <i className="fa-solid fa-envelope text-[var(--primary-light)]" />
-              Email được gửi qua Resend
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

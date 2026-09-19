@@ -4,6 +4,7 @@ import React from 'react';
 import LoginPage from './login/page';
 import RegisterPage from './register/page';
 import ForgotPasswordPage from './forgot-password/page';
+import AuthLayout from './layout';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -36,6 +37,18 @@ vi.mock('@/lib/supabase/client', () => ({
 }));
 
 describe('Authentication Pages', () => {
+  it('keeps the For Better Balance story around every auth flow', () => {
+    render(
+      <AuthLayout>
+        <div>Auth form</div>
+      </AuthLayout>,
+    );
+
+    expect(screen.getByText('For Better Balance')).toBeInTheDocument();
+    expect(screen.getByText(/Cân bằng chuyện tiền bạc/i)).toBeInTheDocument();
+    expect(screen.getByText('Auth form')).toBeInTheDocument();
+  });
+
   describe('LoginPage', () => {
     it('renders login form properly', () => {
       render(<LoginPage />);

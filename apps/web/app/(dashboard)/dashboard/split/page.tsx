@@ -6,6 +6,8 @@ import { useAppStore } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import { toast } from 'sonner';
 import { trackEvent } from '@/lib/analytics';
+import { Calculator } from 'lucide-react';
+import { DashboardPageIntro } from '@/components/shared/DashboardPageIntro';
 
 type SplitMode = 'equal' | 'ratio' | 'days';
 
@@ -226,12 +228,18 @@ export default function SplitPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1320px] space-y-5">
+      <DashboardPageIntro
+        icon={Calculator}
+        eyebrow="Công cụ tài chính phòng"
+        title="Chia Tiền Nâng Cao"
+        description="Nhập một khoản chi, chọn cách chia phù hợp và để mọi thành viên thấy con số rõ ràng ngay từ đầu."
+      />
       {/* Tab Split */}
       <div id="tab-split">
         {/* Main Card */}
         <div
-          className="rounded-2xl border"
+          className="glass-surface-strong overflow-hidden rounded-[var(--radius-xl)] border"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',
@@ -269,6 +277,7 @@ export default function SplitPage() {
             >
               <button
                 onClick={() => setSplitMode('equal')}
+                aria-pressed={splitMode === 'equal'}
                 className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
                   splitMode === 'equal' ? 'text-white shadow-md' : ''
                 }`}
@@ -282,6 +291,7 @@ export default function SplitPage() {
               </button>
               <button
                 onClick={() => setSplitMode('ratio')}
+                aria-pressed={splitMode === 'ratio'}
                 className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
                   splitMode === 'ratio' ? 'text-white shadow-md' : ''
                 }`}
@@ -295,6 +305,7 @@ export default function SplitPage() {
               </button>
               <button
                 onClick={() => setSplitMode('days')}
+                aria-pressed={splitMode === 'days'}
                 className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
                   splitMode === 'days' ? 'text-white shadow-md' : ''
                 }`}
@@ -379,8 +390,8 @@ export default function SplitPage() {
                   {members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5"
-                      style={{ borderColor: 'var(--border)' }}
+                      className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
+                      style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
                     >
                       <div
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
@@ -451,8 +462,8 @@ export default function SplitPage() {
                   {members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5"
-                      style={{ borderColor: 'var(--border)' }}
+                      className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
+                      style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
                     >
                       <div
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
@@ -558,8 +569,8 @@ export default function SplitPage() {
               {members.map((member, index) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between rounded-lg border bg-white px-4 py-2.5"
-                  style={{ borderColor: 'var(--border)' }}
+                  className="flex items-center justify-between rounded-lg border px-4 py-2.5"
+                  style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
                 >
                   <div className="flex items-center gap-2">
                     <div
@@ -704,6 +715,26 @@ export default function SplitPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {expenses.length === 0 && !showPreview && (
+          <div
+            className="mt-5 rounded-[var(--radius-lg)] border border-dashed p-8 text-center"
+            style={{ background: 'var(--glass-surface)', borderColor: 'var(--border)' }}
+          >
+            <span
+              className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
+              style={{ background: 'var(--color-bg-soft-primary)', color: 'var(--primary)' }}
+            >
+              <i className="fa-solid fa-receipt" />
+            </span>
+            <h3 className="brand-font mt-4 text-base font-bold" style={{ color: 'var(--text-heading)' }}>
+              Chưa có khoản chi nào
+            </h3>
+            <p className="mx-auto mt-2 max-w-md text-sm" style={{ color: 'var(--text-muted)' }}>
+              Khoản chi đầu tiên bạn xác nhận sẽ xuất hiện ở đây để cả phòng dễ theo dõi.
+            </p>
           </div>
         )}
       </div>

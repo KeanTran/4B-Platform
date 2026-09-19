@@ -15,31 +15,37 @@ export function LiveChat() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.email.trim() || !form.message.trim()) {
       toast.error('Vui lòng nhập email và nội dung tin nhắn!');
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      // Save to localStorage for demo persistence
-      try {
-        const existing = JSON.parse(localStorage.getItem('4b_chat_messages') || '[]');
-        existing.push({
-          ...form,
-          timestamp: new Date().toISOString(),
-        });
-        localStorage.setItem('4b_chat_messages', JSON.stringify(existing));
-      } catch (e) {
-        console.error(e);
-      }
+    const website = String(new FormData(e.currentTarget).get('company') ?? '');
+    try {
+      setLoading(true);
+      const response = await fetch('/api/support/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          phone: form.tel.trim(),
+          message: form.message.trim(),
+          source_path: window.location.pathname,
+          website,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? 'Không thể gửi yêu cầu hỗ trợ.');
 
-      setLoading(false);
       setIsSubmitted(true);
-      toast.success('Tin nhắn đã được gửi tới đội ngũ 4B!');
-    }, 600);
+      toast.success(result.message ?? 'Yêu cầu đã vào hộp thư hỗ trợ của 4B!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Không thể gửi yêu cầu hỗ trợ.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -48,17 +54,18 @@ export function LiveChat() {
   };
 
   return (
-    <aside aria-label="Hỗ trợ trực tuyến" className="fixed bottom-0 right-4 sm:right-8 z-50 max-w-[calc(100vw-32px)]">
+    <aside aria-label="Hỗ trợ trực tuyến" className="fixed bottom-4 right-4 z-50 max-w-[calc(100vw-32px)] sm:bottom-0 sm:right-8">
       {/* Closed State Bar Button matching reference design */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group flex w-48 sm:w-52 items-center justify-between rounded-t-xl px-5 py-2.5 text-white shadow-xl transition-all duration-200 hover:brightness-105 active:scale-[0.99]"
+          className="group flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl transition-all duration-200 hover:brightness-105 active:scale-[0.99] sm:h-auto sm:w-52 sm:justify-between sm:rounded-b-none sm:rounded-t-xl sm:px-5 sm:py-2.5"
           style={{ background: 'var(--primary)' }}
           aria-label="Mở khung chat hỗ trợ"
         >
-          <span className="text-base font-bold tracking-wide">Chat Now</span>
-          <span className="text-xl font-bold leading-none select-none transition-transform duration-200 group-hover:scale-110">+</span>
+          <MessageCircle className="h-5 w-5 sm:hidden" aria-hidden="true" />
+          <span className="hidden text-base font-bold tracking-wide sm:inline">Chat Now</span>
+          <span className="hidden select-none text-xl font-bold leading-none transition-transform duration-200 group-hover:scale-110 sm:inline">+</span>
         </button>
       )}
 
@@ -109,7 +116,7 @@ export function LiveChat() {
                   Gửi thành công!
                 </h4>
                 <p className="text-xs text-[var(--text-muted)] mb-5 leading-relaxed">
-                  Cảm ơn bạn đã liên hệ. Đội ngũ hỗ trợ 4B sẽ phản hồi qua email trong thời gian sớm nhất!
+                  Yêu cầu đã vào Hộp thư hỗ trợ trong Dashboard admin. 4B sẽ phản hồi qua email hoặc số điện thoại bạn cung cấp.
                 </p>
                 <button
                   onClick={handleReset}
@@ -121,12 +128,21 @@ export function LiveChat() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3.5">
+                <input
+                  type="text"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="absolute -left-[9999px] h-px w-px opacity-0"
+                />
                 {/* Email input */}
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-3 h-4 w-4 text-[var(--text-muted)]" />
                   <input
                     type="email"
                     required
+                    maxLength={254}
                     placeholder="Email *"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -144,6 +160,8 @@ export function LiveChat() {
                   <Phone className="absolute left-3.5 top-3 h-4 w-4 text-[var(--text-muted)]" />
                   <input
                     type="tel"
+                    minLength={6}
+                    maxLength={32}
                     placeholder="Tel"
                     value={form.tel}
                     onChange={(e) => setForm({ ...form, tel: e.target.value })}
@@ -161,6 +179,8 @@ export function LiveChat() {
                   <Edit3 className="absolute left-3.5 top-3 h-4 w-4 text-[var(--text-muted)]" />
                   <textarea
                     required
+                    minLength={10}
+                    maxLength={2000}
                     rows={4}
                     placeholder="Message *"
                     value={form.message}
@@ -176,7 +196,7 @@ export function LiveChat() {
 
                 {/* Description Note */}
                 <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Nếu bạn có bất kỳ câu hỏi hoặc góp ý nào, vui lòng để lại tin nhắn, chúng tôi sẽ phản hồi sớm nhất có thể!
+                  Đây là hộp thư hỗ trợ, không phải chat tức thời. Admin sẽ tiếp nhận trong Dashboard và phản hồi qua thông tin liên hệ của bạn.
                 </p>
 
                 {/* Submit button */}

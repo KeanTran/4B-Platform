@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
-import { AIChatExperience } from '@/components/shared/AIChatExperience';
+import { LazyAIChatExperience } from '@/components/shared/LazyAIChatExperience';
 
 const BENEFITS = [
   {
@@ -22,11 +22,11 @@ const BENEFITS = [
 
 export default function AIPage() {
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1320px] space-y-5">
       <section className="overflow-hidden rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass-surface)] p-5 shadow-[var(--shadow-glass)] backdrop-blur-[var(--glass-blur)] md:p-7">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0 overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
-            <AIChatExperience variant="page" />
+            <LazyAIChatExperience />
           </div>
 
           <aside className="space-y-4">

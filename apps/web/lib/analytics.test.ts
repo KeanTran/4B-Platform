@@ -10,6 +10,7 @@ import {
   getAnalyticsConsent,
   setAnalyticsConsent,
   trackEvent,
+  trackWebVital,
 } from './analytics';
 
 describe('analytics privacy guard', () => {
@@ -68,5 +69,29 @@ describe('analytics privacy guard', () => {
     trackEvent('dashboard_guest_started', { entry_path: '/dashboard' });
 
     expect(sendGAEvent).not.toHaveBeenCalled();
+  });
+
+  it('reports Core Web Vitals as integer, non-interaction GA events', () => {
+    setAnalyticsConsent('granted');
+
+    trackWebVital({
+      id: 'v4-123',
+      name: 'CLS',
+      value: 0.1234,
+      delta: 0.0456,
+      rating: 'needs-improvement',
+      navigationType: 'navigate',
+    });
+
+    expect(sendGAEvent).toHaveBeenCalledWith({
+      event: 'web_vital',
+      metric_key: 'CLS',
+      metric_id: 'v4-123',
+      metric_value: 123,
+      metric_delta: 46,
+      metric_rating: 'needs-improvement',
+      navigation_type: 'navigate',
+      non_interaction: true,
+    });
   });
 });

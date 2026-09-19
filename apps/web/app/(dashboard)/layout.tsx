@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { BrandLogo } from '@/components/shared/BrandLogo';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { AIChatWidget } from '@/components/shared/AIChatWidget';
 import { EditMemberModal, QRCodeModal, AddExpenseModal, AddDutyModal, AddMemberModal, NotificationDropdown } from '@/components/shared';
 import { useAppStore } from '@/store/app-store';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import type { User } from '@/types';
+import type { AppRole } from '@/types/auth';
 import { trackEvent } from '@/lib/analytics';
 
 const NAV_ITEMS = [
@@ -30,6 +32,11 @@ const NAV_ITEMS = [
     icon: 'fa-broom',
   },
   {
+    label: 'Tìm Bạn Ở Ghép',
+    href: '/roommates',
+    icon: 'fa-people-roof',
+  },
+  {
     label: '4B Student Pro AI',
     href: '/dashboard/ai',
     icon: 'fa-wand-magic-sparkles',
@@ -40,6 +47,27 @@ const NAV_ITEMS = [
     href: '/dashboard/settings',
     icon: 'fa-gear',
     requiresAuth: true,
+  },
+  {
+    label: 'Quản Trị Người Dùng',
+    href: '/admin/users',
+    icon: 'fa-user-shield',
+    requiresAuth: true,
+    requiresRole: 'admin',
+  },
+  {
+    label: 'Quản Lý Blog',
+    href: '/admin/blog',
+    icon: 'fa-newspaper',
+    requiresAuth: true,
+    requiresRole: 'admin',
+  },
+  {
+    label: 'Hộp Thư Hỗ Trợ',
+    href: '/admin/support',
+    icon: 'fa-headset',
+    requiresAuth: true,
+    requiresRole: 'admin',
   },
 ];
 
@@ -75,11 +103,13 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [userRole, setUserRole] = useState<AppRole>('user');
   const profileRef = useRef<HTMLDivElement>(null);
   const {
     user,
     logout,
     currentRoom,
+    members,
     activateWorkspace,
     workspaceReady,
   } = useAppStore();
@@ -115,6 +145,24 @@ export default function DashboardLayout({
       cancelled = true;
     };
   }, [activateWorkspace]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user) {
+      setUserRole('user');
+      return () => { cancelled = true; };
+    }
+
+    fetch('/api/auth/role', { cache: 'no-store' })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((result) => {
+        if (!cancelled) setUserRole(result?.role === 'admin' ? 'admin' : 'user');
+      })
+      .catch(() => {
+        if (!cancelled) setUserRole('user');
+      });
+    return () => { cancelled = true; };
+  }, [user]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -165,6 +213,12 @@ export default function DashboardLayout({
     }
     return pathname.startsWith(item.href);
   };
+
+  const visibleNavItems = NAV_ITEMS.filter(
+    (item) => !('requiresRole' in item) || !item.requiresRole || item.requiresRole === userRole,
+  );
+  const activeNavItem = visibleNavItems.find(isActive);
+  const roomMembers = members.slice(0, 4);
 
   if (!sessionReady || !workspaceReady) {
     return (
@@ -227,13 +281,45 @@ export default function DashboardLayout({
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
               {user?.email || 'Dữ liệu lưu trên thiết bị'}
             </div>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="flex -space-x-2" aria-label={`${members.length} thành viên trong phòng`}>
+                {roomMembers.length > 0 ? (
+                  roomMembers.map((member, index) => {
+                    const name = member.nickname || member.user?.full_name || 'Thành viên';
+                    return (
+                      <span
+                        key={member.id}
+                        title={name}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border-2 text-[9px] font-extrabold text-white"
+                        style={{
+                          background: ['var(--primary)', 'var(--accent)', 'var(--dark)', '#5f7fd6'][index],
+                          borderColor: 'var(--surface)',
+                        }}
+                      >
+                        {name.trim().charAt(0).toUpperCase()}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-extrabold text-white"
+                    style={{ background: 'var(--primary)' }}
+                  >
+                    4B
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-bold" style={{ color: 'var(--primary)' }}>
+                {members.length > 0 ? `${members.length} thành viên` : 'Sẵn sàng thêm bạn'}
+              </span>
+            </div>
           </div>
         )}
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-3">
           <ul className="space-y-1" style={{ listStyle: 'none' }}>
-            {NAV_ITEMS.map((item, index) => (
+            {visibleNavItems.map((item, index) => (
               <li key={index}>
                 <Link
                   href={getNavHref(item)}
@@ -353,7 +439,7 @@ export default function DashboardLayout({
 
             <nav className="flex-1 overflow-y-auto p-3">
               <ul className="space-y-1" style={{ listStyle: 'none' }}>
-                {NAV_ITEMS.map((item) => (
+                {visibleNavItems.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={getNavHref(item)}
@@ -406,10 +492,11 @@ export default function DashboardLayout({
               className="brand-font text-lg font-bold"
               style={{ color: 'var(--dark)' }}
             >
-              Dashboard
+              {activeNavItem?.label || 'Dashboard'}
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <NotificationDropdown />
             <div className="relative" ref={profileRef}>
               <button
@@ -457,6 +544,37 @@ export default function DashboardLayout({
                           <i className="fa-solid fa-gear w-5 text-center" style={{ color: 'var(--text-muted)' }} />
                           Cài đặt
                         </Link>
+                        {userRole === 'admin' && (
+                          <>
+                            <Link
+                              href="/admin/users"
+                              onClick={() => setProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-[var(--bg-light)]"
+                              style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                            >
+                              <i className="fa-solid fa-user-shield w-5 text-center" />
+                              Quản trị người dùng
+                            </Link>
+                            <Link
+                              href="/admin/blog"
+                              onClick={() => setProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-[var(--bg-light)]"
+                              style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                            >
+                              <i className="fa-solid fa-newspaper w-5 text-center" />
+                              Quản lý Blog
+                            </Link>
+                            <Link
+                              href="/admin/support"
+                              onClick={() => setProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-[var(--bg-light)]"
+                              style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                            >
+                              <i className="fa-solid fa-headset w-5 text-center" />
+                              Hộp thư hỗ trợ
+                            </Link>
+                          </>
+                        )}
                       </>
                     ) : (
                       <Link
@@ -501,7 +619,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {!user && (
+        {!user && pathname.startsWith('/dashboard') && (
           <div
             className="glass-surface mx-3 mt-3 flex flex-col gap-3 rounded-2xl p-4 sm:mx-5 sm:flex-row sm:items-center sm:justify-between"
             style={{

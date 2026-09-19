@@ -8,6 +8,7 @@ import {
   setAnalyticsConsent,
   type AnalyticsConsent,
 } from '@/lib/analytics';
+import { WebVitalsReporter } from './WebVitalsReporter';
 
 interface AnalyticsProviderProps {
   measurementId?: string;
@@ -35,7 +36,12 @@ export function AnalyticsProvider({
 
   return (
     <>
-      {consent === 'granted' && <GoogleAnalytics gaId={measurementId} />}
+      {consent === 'granted' && (
+        <>
+          <GoogleAnalytics gaId={measurementId} />
+          <WebVitalsReporter />
+        </>
+      )}
 
       {consent === null && (
         <section

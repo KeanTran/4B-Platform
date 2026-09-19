@@ -6,5 +6,7 @@ export { AddDutyModal } from './AddDutyModal';
 export { AddMemberModal } from './AddMemberModal';
 export { NotificationDropdown } from './NotificationDropdown';
 export { AIChatWidget } from './AIChatWidget';
+export { DashboardPageIntro } from './DashboardPageIntro';
+export { ThemeToggle } from './ThemeToggle';
 export { BrandLogo } from './BrandLogo';
 export { BackToTop } from './BackToTop';

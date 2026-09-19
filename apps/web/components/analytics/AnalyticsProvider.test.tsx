@@ -8,12 +8,18 @@ vi.mock('@next/third-parties/google', () => ({
   sendGAEvent: vi.fn(),
 }));
 
+vi.mock('next/web-vitals', () => ({
+  useReportWebVitals: vi.fn(),
+}));
+
 import { AnalyticsProvider } from './AnalyticsProvider';
 import { ANALYTICS_CONSENT_KEY } from '@/lib/analytics';
+import { useReportWebVitals } from 'next/web-vitals';
 
 describe('AnalyticsProvider', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    vi.clearAllMocks();
   });
 
   it('does not render analytics or consent UI without a valid measurement ID', () => {
@@ -28,10 +34,12 @@ describe('AnalyticsProvider', () => {
 
     expect(await screen.findByText('Giúp 4B tốt hơn mỗi ngày')).toBeInTheDocument();
     expect(screen.queryByTestId('google-analytics')).not.toBeInTheDocument();
+    expect(useReportWebVitals).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cho phép thống kê' }));
 
     expect(screen.getByTestId('google-analytics')).toHaveTextContent('G-TEST123');
+    expect(useReportWebVitals).toHaveBeenCalledOnce();
     expect(window.localStorage.getItem(ANALYTICS_CONSENT_KEY)).toBe('granted');
   });
 

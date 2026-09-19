@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Lexend } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
+import { getGoogleSiteVerification, getSiteUrl } from '@/lib/site';
 import '../styles/globals.css';
 
 const inter = Inter({
@@ -18,10 +19,7 @@ const lexend = Lexend({
   display: 'swap',
 });
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-  ),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: '4B - Quản Lý & Chia Chi Phí Phòng Trọ Thông Minh',
     template: '%s | 4B Platform',
@@ -64,6 +62,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  verification: {
+    google: getGoogleSiteVerification(),
   },
 };
 

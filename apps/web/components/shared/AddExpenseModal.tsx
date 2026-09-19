@@ -197,8 +197,8 @@ export function AddExpenseModal() {
                 return (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between rounded-lg border bg-white px-3 py-2"
-                    style={{ borderColor: 'var(--border)' }}
+                    className="flex items-center justify-between rounded-lg border px-3 py-2"
+                    style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
                   >
                     <span className="text-sm font-medium" style={{ color: 'var(--dark)' }}>
                       {member.nickname || 'Thành viên'}

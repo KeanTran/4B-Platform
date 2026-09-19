@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 export const PROTECTED_DASHBOARD_ROUTES = [
   '/dashboard/profile',
   '/dashboard/settings',
+  '/admin',
 ] as const;
 
 export function isProtectedDashboardRoute(pathname: string) {
@@ -19,7 +20,7 @@ function redirectToLogin(request: NextRequest) {
   return NextResponse.redirect(url);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request: {
       headers: request.headers,

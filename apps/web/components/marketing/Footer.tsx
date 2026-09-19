@@ -8,16 +8,18 @@ const FOOTER_LINKS = {
     title: 'Sản phẩm',
     links: [
       { label: 'Dashboard miễn phí', href: '/dashboard' },
-      { label: 'Bộ công cụ', href: '#features' },
-      { label: 'Cách sử dụng', href: '#how-it-works' },
-      { label: 'Gói Free & Pro', href: '#pricing' },
-      { label: 'FAQ', href: '#faq' },
+      { label: 'Bộ công cụ', href: '/product' },
+      { label: 'Cách sử dụng', href: '/how-it-works' },
+      { label: 'Tìm bạn ở ghép', href: '/roommates' },
+      { label: 'Gói Free & Pro', href: '/pricing' },
+      { label: 'FAQ', href: '/faq' },
     ],
   },
   company: {
     title: 'Công ty',
     links: [
-      { label: 'Về chúng tôi', href: '#about' },
+      { label: 'Về chúng tôi', href: '/about' },
+      { label: 'Blog', href: '/blog' },
       { label: 'Liên hệ', href: 'mailto:4bforbetterbalance@gmail.com' },
       { label: 'Facebook', href: 'https://www.facebook.com/share/1JFn1i3hji/?mibextid=wwXIfr' },
     ],
@@ -36,7 +38,7 @@ export function Footer() {
     <footer
       className="border-t"
       style={{
-        background: 'var(--dark)',
+        background: 'var(--color-footer-bg)',
         borderColor: 'var(--color-footer-divider)',
       }}
     >

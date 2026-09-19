@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
-import { isProtectedDashboardRoute, middleware } from './middleware';
+import { isProtectedDashboardRoute, proxy } from './proxy';
 
 describe('Dashboard route boundaries', () => {
   it.each([
@@ -19,12 +19,15 @@ describe('Dashboard route boundaries', () => {
     '/dashboard/profile/security',
     '/dashboard/settings',
     '/dashboard/settings/billing',
+    '/admin/users',
+    '/admin/blog',
+    '/admin/support',
   ])('protects personal or sensitive routes: %s', (pathname) => {
     expect(isProtectedDashboardRoute(pathname)).toBe(true);
   });
 
   it('serves the public Dashboard when Supabase is not configured', async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest('http://localhost:3000/dashboard/split'),
     );
     expect(response.status).toBe(200);
@@ -32,7 +35,7 @@ describe('Dashboard route boundaries', () => {
   });
 
   it('fails closed for sensitive routes when Supabase is not configured', async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest('http://localhost:3000/dashboard/settings'),
     );
     expect(response.status).toBe(307);

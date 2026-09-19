@@ -9,6 +9,8 @@ import {
 } from '@/store/app-store';
 import { useUIStore } from '@/store/ui-store';
 import type { RoomMember } from '@/types';
+import { CalendarCheck2 } from 'lucide-react';
+import { DashboardPageIntro } from '@/components/shared/DashboardPageIntro';
 
 const DAY_LABELS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 const DAY_FULL_LABELS = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
@@ -339,12 +341,18 @@ export default function DutiesPage() {
   const weekRangeText = `${formatDate(currentWeekStart)} - ${formatDate(weekEnd)}`;
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1320px] space-y-5">
+      <DashboardPageIntro
+        icon={CalendarCheck2}
+        eyebrow="Nhịp sống trong phòng"
+        title="Lịch Trực Nhật"
+        description="Mỗi người biết phần việc của mình, cả phòng giữ được không gian dễ chịu mà không cần nhắc nhau quá nhiều."
+      />
       {/* Tab Lịch Trực Nhật */}
       <div id="tab-duty">
         {/* Main Card */}
         <div
-          className="rounded-2xl border"
+          className="glass-surface-strong overflow-hidden rounded-[var(--radius-xl)] border"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',
@@ -518,12 +526,14 @@ export default function DutiesPage() {
                               }
                             : {
                                 borderColor: 'var(--accent-light)',
-                                background: 'white',
+                                background: 'var(--surface)',
                               }
                         }
                       >
                         <button
                           onClick={() => handleToggleDutyStatus(duty.id)}
+                          aria-label={`${duty.status === 'done' ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}: ${duty.task}`}
+                          aria-pressed={duty.status === 'done'}
                           className="w-full text-left"
                         >
                           <div className="mb-0.5 flex items-center gap-1">
@@ -549,6 +559,7 @@ export default function DutiesPage() {
                           className="absolute -right-1 -top-1 hidden h-4 w-4 items-center justify-center rounded-full text-white group-hover:flex"
                           style={{ background: 'var(--danger)', fontSize: '8px' }}
                           title="Xóa"
+                          aria-label={`Xóa nhiệm vụ ${duty.task}`}
                         >
                           <i className="fa-solid fa-times" />
                         </button>

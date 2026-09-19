@@ -83,7 +83,7 @@ export function Blog() {
         throw new Error(data.error || 'Có lỗi xảy ra khi đăng bài');
       }
 
-      toast.success('Đăng bài viết thành công! Bài viết đã sẵn sàng trên toàn hệ thống.');
+      toast.success(data.message || 'Đã gửi bài viết. Admin sẽ duyệt trước khi bài được công khai.');
       setFormData({
         author_name: '',
         title: '',
@@ -92,12 +92,6 @@ export function Blog() {
         content: '',
       });
       setIsCreateModalOpen(false);
-      // Prepend to posts
-      if (data.post) {
-        setPosts((prev) => [data.post, ...prev]);
-      } else {
-        fetchPosts();
-      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Không thể đăng bài viết';
       toast.error(msg);
@@ -320,6 +314,17 @@ export function Blog() {
               </div>
 
               <form onSubmit={handleCreatePost} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <div
+                  className="rounded-xl border px-3.5 py-3 text-xs leading-relaxed"
+                  style={{
+                    background: 'var(--color-bg-soft-primary)',
+                    borderColor: 'var(--color-border-soft-primary)',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Bạn cần đăng nhập để gửi bài. Nội dung sẽ ở trạng thái chờ duyệt và chỉ xuất
+                  hiện công khai sau khi admin phê duyệt.
+                </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--dark)' }}>
                     Họ và tên tác giả <span className="text-red-500">*</span>
@@ -327,6 +332,8 @@ export function Blog() {
                   <input
                     type="text"
                     required
+                    minLength={2}
+                    maxLength={80}
                     placeholder="Ví dụ: Nguyễn Văn An"
                     value={formData.author_name}
                     onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
@@ -368,6 +375,7 @@ export function Blog() {
                     </label>
                     <input
                       type="text"
+                      maxLength={500}
                       placeholder="Mô tả tóm tắt nội dung..."
                       value={formData.excerpt}
                       onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
@@ -388,6 +396,8 @@ export function Blog() {
                   <input
                     type="text"
                     required
+                    minLength={3}
+                    maxLength={180}
                     placeholder="Ví dụ: Bí quyết phân chia tiền điện nước không cãi vã"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -406,6 +416,8 @@ export function Blog() {
                   </label>
                   <textarea
                     required
+                    minLength={20}
+                    maxLength={50000}
                     rows={5}
                     placeholder="Viết nội dung chia sẻ chi tiết của bạn tại đây..."
                     value={formData.content}

@@ -8,6 +8,8 @@ import type { User, Room } from '@/types';
 import { toast } from 'sonner';
 import { Modal } from '@/components/shared/Modal';
 import { createClient } from '@/lib/supabase/client';
+import { UserRound } from 'lucide-react';
+import { DashboardPageIntro } from '@/components/shared/DashboardPageIntro';
 
 export default function ProfilePage() {
   const { user, setUser, members, currentRoom, setCurrentRoom } = useAppStore();
@@ -200,11 +202,17 @@ export default function ProfilePage() {
   const displayAvatar = avatarPreview || user?.avatar_url;
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1120px] space-y-5">
+      <DashboardPageIntro
+        icon={UserRound}
+        eyebrow="Không gian của bạn"
+        title="Hồ Sơ Cá Nhân"
+        description="Giữ thông tin cá nhân và thông tin phòng luôn chính xác để mọi người nhận ra nhau và phối hợp dễ dàng hơn."
+      />
       <div id="tab-profile">
         {/* Profile Header */}
         <div
-          className="rounded-2xl border p-6"
+            className="glass-surface-strong rounded-[var(--radius-xl)] border p-6"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',

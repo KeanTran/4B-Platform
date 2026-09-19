@@ -1,6 +1,6 @@
 import { Header } from '@/components/marketing/Header';
 import { Footer } from '@/components/marketing/Footer';
-import { DemoModal } from '@/components/marketing';
+import { DemoModal } from '@/components/marketing/DemoModal';
 import { BackToTop } from '@/components/shared/BackToTop';
 
 import { LiveChat } from '@/components/marketing/LiveChat';

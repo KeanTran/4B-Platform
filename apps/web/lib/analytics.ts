@@ -13,7 +13,17 @@ export type AnalyticsEventName =
   | 'login_completed'
   | 'signup_completed'
   | 'split_completed'
-  | 'upgrade_clicked';
+  | 'upgrade_clicked'
+  | 'web_vital';
+
+export interface WebVitalMetric {
+  id: string;
+  name: string;
+  value: number;
+  delta: number;
+  rating?: string;
+  navigationType?: string;
+}
 
 type AnalyticsValue = string | number | boolean;
 type AnalyticsProperties = Record<string, AnalyticsValue | null | undefined>;
@@ -59,4 +69,18 @@ export function trackEvent(
   );
 
   sendGAEvent({ event, ...safeProperties });
+}
+
+export function trackWebVital(metric: WebVitalMetric) {
+  const scale = metric.name === 'CLS' ? 1_000 : 1;
+
+  trackEvent('web_vital', {
+    metric_key: metric.name,
+    metric_id: metric.id,
+    metric_value: Math.round(metric.value * scale),
+    metric_delta: Math.round(metric.delta * scale),
+    metric_rating: metric.rating,
+    navigation_type: metric.navigationType,
+    non_interaction: true,
+  });
 }

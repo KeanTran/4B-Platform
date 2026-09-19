@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
+import { Settings2 } from 'lucide-react';
+import { DashboardPageIntro } from '@/components/shared/DashboardPageIntro';
 
 const BANK_OPTIONS = [
   { value: '', label: '-- Chọn ngân hàng --' },
@@ -108,12 +110,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1120px] space-y-5">
+      <DashboardPageIntro
+        icon={Settings2}
+        eyebrow="Cá nhân hóa không gian"
+        title="Cài Đặt"
+        description="Thiết lập thông tin thanh toán, nhắc nhở và ngân sách để 4B hoạt động đúng với cách phòng bạn đang sống."
+      />
       {/* Tab Settings */}
       <div id="tab-settings">
         {/* Bank Settings Card */}
         <div
-          className="rounded-2xl border"
+          className="glass-surface-strong overflow-hidden rounded-[var(--radius-xl)] border"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',
@@ -162,12 +170,14 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div>
                 <label
+                  htmlFor="settings-bank-name"
                   className="mb-1 block text-xs font-semibold"
                   style={{ color: 'var(--dark)' }}
                 >
                   Ngân hàng
                 </label>
                 <select
+                  id="settings-bank-name"
                   value={bankInfo.bankName}
                   onChange={(e) => handleBankFieldChange('bankName', e.target.value)}
                   className="w-full rounded-xl border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
@@ -187,12 +197,14 @@ export default function SettingsPage() {
 
               <div>
                 <label
+                  htmlFor="settings-account-number"
                   className="mb-1 block text-xs font-semibold"
                   style={{ color: 'var(--dark)' }}
                 >
                   Số tài khoản
                 </label>
                 <input
+                  id="settings-account-number"
                   type="text"
                   value={bankInfo.accountNumber}
                   onChange={(e) => handleBankFieldChange('accountNumber', e.target.value)}
@@ -208,12 +220,14 @@ export default function SettingsPage() {
 
               <div>
                 <label
+                  htmlFor="settings-account-holder"
                   className="mb-1 block text-xs font-semibold"
                   style={{ color: 'var(--dark)' }}
                 >
                   Tên chủ tài khoản
                 </label>
                 <input
+                  id="settings-account-holder"
                   type="text"
                   value={bankInfo.accountHolder}
                   onChange={(e) => handleBankFieldChange('accountHolder', e.target.value)}
@@ -246,7 +260,7 @@ export default function SettingsPage() {
 
         {/* Notification Settings */}
         <div
-          className="mt-5 rounded-2xl border"
+          className="glass-surface mt-5 overflow-hidden rounded-[var(--radius-xl)] border"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',
@@ -292,7 +306,9 @@ export default function SettingsPage() {
                   onClick={() => handleToggleNotification('expenseReminder')}
                   className="relative h-7 w-12 cursor-pointer rounded-full p-0.5 transition-colors"
                   style={{ background: notificationSettings.expenseReminder ? 'var(--primary)' : 'var(--border)' }}
-                  aria-label="Toggle expense reminder"
+                  role="switch"
+                  aria-checked={notificationSettings.expenseReminder}
+                  aria-label="Bật hoặc tắt nhắc nhở đóng tiền"
                 >
                   <div
                     className="h-6 w-6 rounded-full bg-white shadow transition-transform"
@@ -329,7 +345,9 @@ export default function SettingsPage() {
                   onClick={() => handleToggleNotification('paymentConfirmation')}
                   className="relative h-7 w-12 cursor-pointer rounded-full p-0.5 transition-colors"
                   style={{ background: notificationSettings.paymentConfirmation ? 'var(--primary)' : 'var(--border)' }}
-                  aria-label="Toggle payment confirmation"
+                  role="switch"
+                  aria-checked={notificationSettings.paymentConfirmation}
+                  aria-label="Bật hoặc tắt xác nhận thanh toán"
                 >
                   <div
                     className="h-6 w-6 rounded-full bg-white shadow transition-transform"
@@ -366,7 +384,9 @@ export default function SettingsPage() {
                   onClick={() => handleToggleNotification('dutyReminder')}
                   className="relative h-7 w-12 cursor-pointer rounded-full p-0.5 transition-colors"
                   style={{ background: notificationSettings.dutyReminder ? 'var(--primary)' : 'var(--border)' }}
-                  aria-label="Toggle duty reminder"
+                  role="switch"
+                  aria-checked={notificationSettings.dutyReminder}
+                  aria-label="Bật hoặc tắt nhắc nhở nhiệm vụ"
                 >
                   <div
                     className="h-6 w-6 rounded-full bg-white shadow transition-transform"
@@ -380,7 +400,7 @@ export default function SettingsPage() {
 
         {/* Budget Settings */}
         <div
-          className="mt-5 rounded-2xl border"
+          className="glass-surface mt-5 overflow-hidden rounded-[var(--radius-xl)] border"
           style={{
             background: 'var(--surface)',
             borderColor: 'var(--border)',
@@ -399,12 +419,14 @@ export default function SettingsPage() {
           <div className="p-4">
             <div>
               <label
+                htmlFor="settings-monthly-budget"
                 className="mb-1 block text-xs font-semibold"
                 style={{ color: 'var(--dark)' }}
               >
                 Giới hạn chi tiêu hàng tháng (VNĐ)
               </label>
               <input
+                id="settings-monthly-budget"
                 type="text"
                 value={budgetValue}
                 onChange={handleBudgetChange}

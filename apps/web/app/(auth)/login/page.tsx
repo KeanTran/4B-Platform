@@ -118,13 +118,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      className="flex min-h-screen"
-      style={{ background: 'linear-gradient(135deg, var(--bg-light) 0%, #f5f0d8 100%)' }}
-    >
-      {/* Form Container - Full Width */}
-      <div className="flex w-full items-center justify-center p-6">
-        <div className="w-full max-w-[460px]">
+    <div className="w-full">
+      <div className="w-full">
+        <div className="w-full">
           {/* Logo */}
           <Link href="/" className="mb-8 flex items-center gap-3 no-underline">
             <BrandLogo height={44} />
@@ -138,11 +134,9 @@ export default function LoginPage() {
 
           {/* Form Card */}
           <div
-            className="rounded-3xl border p-10 shadow-lg"
+            className="glass-surface-strong rounded-[var(--radius-xl)] p-6 sm:p-8 lg:p-9"
             style={{
-              background: 'var(--surface)',
               borderColor: 'var(--border)',
-              boxShadow: '0 20px 60px rgba(78, 120, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04)',
             }}
           >
             <h1
@@ -177,6 +171,8 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="student@ueh.edu.vn"
                   autoComplete="email"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'login-email-error' : undefined}
                   className="w-full rounded-xl border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
                   style={{
                     background: 'var(--bg-light)',
@@ -185,7 +181,7 @@ export default function LoginPage() {
                   }}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+                  <p id="login-email-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                     {errors.email}
                   </p>
                 )}
@@ -209,6 +205,8 @@ export default function LoginPage() {
                   placeholder="Ít nhất 8 ký tự"
                   autoComplete="current-password"
                   minLength={8}
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? 'login-password-error' : undefined}
                   className="w-full rounded-xl border px-4 py-3 text-sm transition-colors focus:border-[var(--primary)] focus:outline-none"
                   style={{
                     background: 'var(--bg-light)',
@@ -217,7 +215,7 @@ export default function LoginPage() {
                   }}
                 />
                 {errors.password && (
-                  <p className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
+                  <p id="login-password-error" role="alert" className="mt-1 text-xs" style={{ color: 'var(--danger)' }}>
                     {errors.password}
                   </p>
                 )}
@@ -248,6 +246,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
+                aria-busy={isLoading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
                 style={{
                   background: 'var(--gradient-primary)',

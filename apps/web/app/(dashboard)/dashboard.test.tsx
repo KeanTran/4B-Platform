@@ -45,18 +45,23 @@ describe('Dashboard Pages Render & Interaction', () => {
 
   it('renders Advanced Split calculator page', () => {
     render(<SplitPage />);
+    expect(screen.getByRole('heading', { name: 'Chia Tiền Nâng Cao' })).toBeInTheDocument();
     expect(screen.getByText(/Xác Nhận Phân Bổ Hóa Đơn/i)).toBeInTheDocument();
     expect(screen.getByText(/Chế độ Chia Đều/i)).toBeInTheDocument();
+    expect(screen.queryByText('4 thành viên')).not.toBeInTheDocument();
+    expect(screen.queryByText('0 khoản chi đã lưu')).not.toBeInTheDocument();
+    expect(screen.queryByText('3 cách phân bổ')).not.toBeInTheDocument();
   });
 
   it('renders Duty schedule page', () => {
     render(<DutiesPage />);
-    expect(screen.getByText(/Lịch Trực Nhật/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Lịch Trực Nhật' })).toBeInTheDocument();
   });
 
   it('renders Settings page', () => {
     render(<SettingsPage />);
+    expect(screen.getByRole('heading', { name: 'Cài Đặt' })).toBeInTheDocument();
     expect(screen.getAllByText(/Thông Tin Ngân Hàng/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Thông tin thanh toán/i)).toBeInTheDocument();
+    expect(screen.getByText('Thông tin thanh toán')).toBeInTheDocument();
   });
 });

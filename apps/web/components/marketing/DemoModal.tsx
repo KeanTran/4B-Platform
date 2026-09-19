@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Modal } from '@/components/shared/Modal';
 import { useUIStore } from '@/store/ui-store';
 
 export function DemoModal() {
+  const router = useRouter();
   const { modalOpen, closeModal } = useUIStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
@@ -26,7 +28,7 @@ export function DemoModal() {
       setCurrentStep((prev) => prev + 1);
     } else {
       handleClose();
-      window.location.href = '/register';
+      router.push('/register');
     }
   };
 

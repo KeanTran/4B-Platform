@@ -32,7 +32,7 @@
 ### Backend
 
 - **Supabase** - Database, Auth, Realtime
-- **Groq + Vercel AI Gateway + AI SDK** - AI Chat thật với provider fallback và hạn mức Free/Pro phía server
+- **Groq + Vercel AI Gateway + AI SDK** - AI Chat thật, ưu tiên Groq khi có API key; dùng Gateway khi không cấu hình Groq, với hạn mức Free/Pro phía server
 
 ### Design
 
@@ -69,15 +69,25 @@ cp .env.example .env.local
 # - AI_GATEWAY_MODEL (mặc định openai/gpt-6-astra)
 # - GROQ_API_KEY (được ưu tiên khi có)
 # - GROQ_MODEL (mặc định openai/gpt-oss-120b)
+# - NEXT_PUBLIC_GA_MEASUREMENT_ID (GA4, chỉ tải sau khi người dùng đồng ý)
+# - GOOGLE_SITE_VERIFICATION (token xác minh Google Search Console)
 
 # Hoặc dùng OIDC cho AI Gateway sau khi link dự án Vercel
 npx vercel link
-npx vercel env pull apps/web/.env.local
+npx vercel env pull apps/web/.env.development.local --environment=development
+
+# `env pull` chỉ ghi các biến tải được; `npm run dev` bên dưới sẽ nạp
+# các Development secret (bao gồm GROQ_API_KEY) trực tiếp vào tiến trình.
+# Có thể giữ giá trị override thủ công trong apps/web/.env.local nếu cần.
 
 # Apply migration trong supabase/migrations bằng workflow Supabase của dự án
 
-# Run development server
+# Run development server với biến Development từ Vercel
+# (cần đăng nhập `npx vercel login` và link project một lần)
 npm run dev
+
+# Chỉ chạy giao diện local, không nạp secret Vercel
+npm run dev:offline
 ```
 
 ## Cấu trúc Project
@@ -140,6 +150,13 @@ npm run typecheck
 # Test
 npm test
 ```
+
+## Analytics & SEO production
+
+- Cấu hình `NEXT_PUBLIC_APP_URL` bằng domain production để canonical, Open Graph và sitemap dùng đúng hostname.
+- Cấu hình `NEXT_PUBLIC_GA_MEASUREMENT_ID`; GA4 chỉ tải sau khi người dùng chọn **Cho phép thống kê**. Core Web Vitals được gửi dưới event `web_vital` và không ảnh hưởng bounce rate.
+- Trong GA4 Enhanced Measurement, bật theo dõi thay đổi trang dựa trên browser history để đo client-side navigation mà không gửi page view trùng lặp.
+- Cấu hình `GOOGLE_SITE_VERIFICATION` bằng phần `content` của thẻ xác minh, deploy, sau đó gửi `${NEXT_PUBLIC_APP_URL}/sitemap.xml` trong Google Search Console.
 
 ## Database Schema
 
